@@ -2,7 +2,7 @@ import { Datastore } from 'lapisdb';
 import { Cargo } from '../models/cargo';
 import { Vehicle } from '../models/vehicle';
 
-class DatabaseService {
+export class DatabaseService {
   static cargoStore: Datastore<Cargo>
   static vehicleStore: Datastore<Vehicle>
 
