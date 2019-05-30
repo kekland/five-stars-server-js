@@ -27,8 +27,10 @@
     "typescript": "^3.5.1"
   },
   "dependencies": {
+    "class-transformer": "^0.2.3",
     "class-validator": "^0.9.1",
     "express": "^4.17.1",
-    "lapisdb": "^0.1.6"
+    "lapisdb": "^0.1.6",
+    "reflect-metadata": "^0.1.13"
   }
 }

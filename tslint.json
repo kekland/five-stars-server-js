@@ -30,7 +30,10 @@
     "arrow-parens": false,
     "object-literal-sort-keys": false,
     "semicolon": false,
-    "one-line": false
+    "one-line": false,
+    "max-classes-per-file": {
+      "options": 2
+    }
   },
   "rulesDirectory": []
 }
