@@ -1,4 +1,4 @@
-import { Controller } from './controller';
+import { Controller } from '../lapis_server/controller';
 import { DatabaseService } from '../database/database.service';
 
 export class CargoController extends Controller {
@@ -8,8 +8,6 @@ export class CargoController extends Controller {
   }
 
   getAll = () => {
-    // tslint:disable-next-line:no-console
-    console.log('Attaching method getAll')
     this.router.get('/', async (req, res) => {
       const data = await DatabaseService.cargoStore.get().run()
       res.send(data)
