@@ -1,0 +1,27 @@
+{
+  "name": "five-stars-server",
+  "version": "0.0.0",
+  "description": "A server for Five Stars project",
+  "main": "dist/main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "gulp",
+    "start:prebuilt": "node build/main.js",
+    "start": "gulp && node build/main.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kekland/five-stars-server-js.git"
+  },
+  "author": "kekland <kk.erzhan@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kekland/five-stars-server-js/issues"
+  },
+  "homepage": "https://github.com/kekland/five-stars-server-js#readme",
+  "devDependencies": {
+    "gulp": "^4.0.0",
+    "gulp-typescript": "^5.0.1",
+    "typescript": "^3.5.1"
+  }
+}
