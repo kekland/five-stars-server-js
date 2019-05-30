@@ -1,6 +1,6 @@
 import { Datastore } from 'lapisdb';
-import { Cargo } from '../models/cargo';
-import { Vehicle } from '../models/vehicle';
+import { Cargo } from '../models/cargo.model';
+import { Vehicle } from '../models/vehicle.model';
 
 export class DatabaseService {
   static cargoStore: Datastore<Cargo>

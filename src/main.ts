@@ -1,4 +1,4 @@
-import { Cargo } from './models/cargo'
+import { Cargo } from './models/cargo.model'
 import { DatabaseService } from './database/database.service';
 import * as express from 'express'
 
@@ -10,9 +10,10 @@ const init = async () => {
   // Attach modules
   // ...
 
-  app.listen(3008, () => {
+  const port = 3008
+  app.listen(port, () => {
     // tslint:disable-next-line:no-console
-    console.log(`Listening on port ${3008}`)
+    console.log(`Listening on port ${port}`)
   })
 }
 
