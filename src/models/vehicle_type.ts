@@ -1,0 +1,17 @@
+export enum VehicleType {
+  autoTransporter,
+  onboard,
+  jumbo,
+  closed,
+  isotherm,
+  isothermRefrigerated,
+  containerTransporter,
+  mega,
+  open,
+  refrigerator,
+  dumpTruck,
+  tent,
+  trawl,
+  allMetal,
+  curtain,
+}
