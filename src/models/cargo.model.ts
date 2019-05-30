@@ -21,6 +21,7 @@ export class Cargo extends Model<Cargo> {
     volume: number, price: number, description: string, images: string[], vehicleType: VehicleType, ownerId: string,
   }) {
     super()
+    if (data == null) return;
     this.departure = data.departure
     this.arrival = data.arrival
     this.weight = data.weight

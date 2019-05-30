@@ -24,7 +24,8 @@ const requestMethod = async (fn, req, res) => {
       res.status(BadRequestException.code).send(e.message)
     }
     else {
-      res.status(500).send({message: e})
+      console.log(`[500] ${e.message}`)
+      res.status(500).send({message: e.message})
     }
   }
 }

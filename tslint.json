@@ -33,7 +33,10 @@
     "one-line": false,
     "max-classes-per-file": {
       "options": 2
-    }
+    },
+    "curly": [
+      false
+    ]
   },
   "rulesDirectory": []
 }

@@ -1,14 +1,17 @@
 import { NamedPositionWithTime } from '../../models/named.position.with.time';
 import { VehicleType } from '../../models/vehicle_type';
 import * as Validator from 'class-validator'
+import { Type } from 'class-transformer';
 
 export class CargoAssignRequestObject {
   @Validator.IsNotEmpty()
   @Validator.ValidateNested()
+  @Type(() => NamedPositionWithTime)
   departure: NamedPositionWithTime;
 
   @Validator.IsNotEmpty()
   @Validator.ValidateNested()
+  @Type(() => NamedPositionWithTime)
   arrival: NamedPositionWithTime;
 
   @Validator.IsNotEmpty()

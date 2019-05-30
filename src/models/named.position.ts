@@ -18,7 +18,8 @@ export class NamedPosition {
   @Validator.Length(2)
   name: string;
 
-  constructor(data: {latitude: number, longitude: number, name: string}) {
+  constructor(data: { latitude: number, longitude: number, name: string }) {
+    if (data == null) return;
     this.latitude = data.latitude
     this.longitude = data.longitude
     this.name = data.name

@@ -19,12 +19,10 @@ export class CargoController extends Controller {
   @Post()
   async create(req) {
     const data = plainToClass(CargoAssignRequestObject, req.body)
-    console.log(data)
     const errors = await ValidationService.validate(data)
     if (errors.length > 0) {
       throw new BadRequestException(errors)
     }
-
 
     const cargo = await DatabaseService.cargoStore.push().item(new Cargo({
       arrival: data.arrival,
