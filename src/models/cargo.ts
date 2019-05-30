@@ -10,6 +10,7 @@ export class Cargo extends Model<Cargo> {
   volume: number;
   price: number;
   description: string;
+  images: string[];
 
   vehicleType: VehicleType;
 
@@ -17,7 +18,7 @@ export class Cargo extends Model<Cargo> {
 
   constructor(data: {
     departure: PositionTime, arrival: PositionTime, weight: number,
-    volume: number, price: number, description: string, vehicleType: VehicleType, ownerId: string,
+    volume: number, price: number, description: string, images: string[], vehicleType: VehicleType, ownerId: string,
   }) {
     super()
     this.departure = data.departure
@@ -27,6 +28,7 @@ export class Cargo extends Model<Cargo> {
     this.price = data.price
     this.vehicleType = data.vehicleType
     this.description = data.description
+    this.images = data.images
     this.ownerId = data.ownerId
   }
 }
