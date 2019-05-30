@@ -1,10 +1,10 @@
 import { Model } from 'lapisdb'
-import { PositionTime } from './position_time';
 import { VehicleType } from './vehicle_type';
+import { NamedPosition } from './position';
 
 export class Vehicle extends Model<Vehicle> {
-  departure: Position;
-  arrival: Position;
+  departure: NamedPosition;
+  arrival: NamedPosition;
 
   weight: number;
   volume: number;
@@ -16,7 +16,7 @@ export class Vehicle extends Model<Vehicle> {
   ownerId: string;
 
   constructor(data: {
-    departure: Position, arrival: Position, weight: number,
+    departure: NamedPosition, arrival: NamedPosition, weight: number,
     volume: number, description: string, images: string[], vehicleType: VehicleType, ownerId: string,
   }) {
     super()
