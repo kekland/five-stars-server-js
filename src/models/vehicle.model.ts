@@ -1,6 +1,6 @@
 import { Model } from 'lapisdb'
 import { VehicleType } from './vehicle_type';
-import { NamedPosition } from './position';
+import { NamedPosition } from './named.position';
 
 export class Vehicle extends Model<Vehicle> {
   departure: NamedPosition;

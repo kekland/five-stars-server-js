@@ -1,5 +1,5 @@
 import { Model } from 'lapisdb'
-import { NamedPositionWithTime } from './position';
+import { NamedPositionWithTime } from './named.position.with.time';
 import { VehicleType } from './vehicle_type';
 
 export class Cargo extends Model<Cargo> {
