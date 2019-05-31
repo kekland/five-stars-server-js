@@ -4,6 +4,7 @@ import * as express from 'express'
 import { CargoController } from './controllers/cargo.controller';
 import bodyParser = require('body-parser');
 import { Controller } from './lapis_server/controller';
+import { verify } from 'jsonwebtoken';
 
 const init = async () => {
   // Initialize the database
@@ -12,6 +13,26 @@ const init = async () => {
 
   // Attach modules
   app.use(bodyParser({ extended: true }))
+  app.use((req, res, next) => {
+    const auth = req.header('authorization')
+    if (auth != null) {
+      const parts = auth.split(' ')
+      if (parts[0].toLowerCase() === 'bearer') {
+        try {
+          const payload = verify(parts[1], 'my-secret-key');
+          (req as any).payload = payload
+          next()
+        }
+        catch (e) {
+          res.status(401).send({ message: 'Invalid JWT token' })
+        }
+      }
+      next()
+    }
+    else {
+      next()
+    }
+  })
 
   const controllers: Controller[] = [
     new CargoController(),
