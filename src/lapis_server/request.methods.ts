@@ -28,7 +28,6 @@ const requestMethod = async (fn, req, res) => {
     }
     else {
       // tslint:disable-next-line:no-console
-      console.log(`[500] ${e.message}`)
       res.status(500).send({message: e.message})
     }
   }

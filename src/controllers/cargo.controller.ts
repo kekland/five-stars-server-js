@@ -7,7 +7,7 @@ import { ValidationService } from '../lapis_server/utils';
 import { Cargo } from '../models/cargo.model';
 import { BadRequestException, UnauthorizedException } from '../lapis_server/errors';
 import { Request } from 'express'
-import { Get, Post, Put } from '../lapis_server/request.methods';
+import { Get, Post, Put, Delete } from '../lapis_server/request.methods';
 
 @RoutedController('/cargo')
 export class CargoController extends Controller {
@@ -30,11 +30,24 @@ export class CargoController extends Controller {
   }
 
   @Put('/:id')
-  async update(req: Request) {
+  async update(req) {
+    if (req.payload == null) {
+      throw new UnauthorizedException({ message: 'Not allowed to edit this cargo.' })
+    }
+
     const data = await ValidationService
       .transformAndValidate<CargoAssignRequestObject>(req.body, () => CargoAssignRequestObject)
 
-    const cargo = await DatabaseService.cargoStore.edit().id(req.params.id).with({
+    let cargo = await DatabaseService.cargoStore.get().where((item) => item.meta.id === req.params.id).first()
+
+    if (cargo == null) {
+      throw new BadRequestException({ message: 'Cargo with this ID is not found.' })
+    }
+    else if (cargo.ownerId !== req.payload.username) {
+      throw new UnauthorizedException({ message: 'Not allowed to edit this cargo.' })
+    }
+
+    await DatabaseService.cargoStore.edit().id(req.params.id).with({
       arrival: data.arrival,
       departure: data.departure,
       description: data.description,
@@ -45,6 +58,28 @@ export class CargoController extends Controller {
       weight: data.weight,
     }).run()
 
+    cargo = await DatabaseService.cargoStore.get().where((item) => item.meta.id === req.params.id).first()
+
     return cargo;
+  }
+
+  @Delete('/:id')
+  async delete(req) {
+    if (req.payload == null) {
+      throw new UnauthorizedException({ message: 'Not allowed to delete this cargo.' })
+    }
+
+    const cargo = await DatabaseService.cargoStore.get().where((item) => item.meta.id === req.params.id).first()
+
+    if (cargo == null) {
+      throw new BadRequestException({ message: 'Cargo with this ID is not found.' })
+    }
+    else if (cargo.ownerId !== req.payload.username) {
+      throw new UnauthorizedException({ message: 'Not allowed to delete this cargo.' })
+    }
+
+    await DatabaseService.cargoStore.delete().id(req.params.id).run()
+
+    return { deleted: true }
   }
 }
