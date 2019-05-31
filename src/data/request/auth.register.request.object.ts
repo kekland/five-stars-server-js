@@ -24,6 +24,11 @@ export class AuthRegisterRequestObject {
   phoneNumber: string;
 
   @Validator.IsNotEmpty()
+  @Validator.IsString()
+  @Validator.Length(2)
+  organization: string;
+
+  @Validator.IsNotEmpty()
   @Validator.ValidateNested()
   @Type(() => Name)
   name: Name;

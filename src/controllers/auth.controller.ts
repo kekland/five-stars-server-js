@@ -8,6 +8,7 @@ import { BadRequestException } from '../lapis_server/errors';
 import { UserService } from '../database/user.service';
 import { AuthAvailabilityRequestObject } from '../data/request/auth.availability.request.object';
 import { sign, decode, verify } from 'jsonwebtoken'
+import { Request } from 'express'
 import { AuthLoginRequestObject } from '../data/request/auth.login.request.object';
 
 @RoutedController('/auth')

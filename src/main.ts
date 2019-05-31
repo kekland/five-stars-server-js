@@ -5,6 +5,7 @@ import { CargoController } from './controllers/cargo.controller';
 import bodyParser = require('body-parser');
 import { Controller } from './lapis_server/controller';
 import { verify } from 'jsonwebtoken';
+import { AuthController } from './controllers/auth.controller';
 
 const init = async () => {
   // Initialize the database
@@ -27,7 +28,9 @@ const init = async () => {
           res.status(401).send({ message: 'Invalid JWT token' })
         }
       }
-      next()
+      else {
+        next()
+      }
     }
     else {
       next()
@@ -36,6 +39,7 @@ const init = async () => {
 
   const controllers: Controller[] = [
     new CargoController(),
+    new AuthController(),
   ]
 
   controllers.forEach(controller => {

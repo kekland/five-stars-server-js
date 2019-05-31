@@ -11,13 +11,14 @@ export class User extends Model<User> {
   phoneNumber: string;
 
   name: Name;
+  organization: string;
 
   cargo: string[];
   vehicles: string[];
 
   constructor(data: {
     username: string, hashedPassword: string, email: string, phoneNumber: string, name: Name,
-    cargo: string[], vehicles: string[],
+    cargo: string[], vehicles: string[], organization: string,
   }) {
     super()
     if (data == null) return;
@@ -25,6 +26,7 @@ export class User extends Model<User> {
     this.hashedPassword = data.hashedPassword
     this.email = data.email
     this.phoneNumber = data.phoneNumber
+    this.organization = data.organization
     this.name = data.name
     this.cargo = data.cargo
     this.vehicles = data.vehicles
@@ -36,6 +38,7 @@ export class User extends Model<User> {
       hashedPassword: hashSync(data.password, genSaltSync(10)),
       email: data.email,
       name: data.name,
+      organization: data.organization,
       phoneNumber: data.phoneNumber,
       cargo: [],
       vehicles: [],
