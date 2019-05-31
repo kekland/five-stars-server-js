@@ -8,7 +8,7 @@ import { Cargo } from '../models/cargo.model';
 import { BadRequestException } from '../lapis_server/errors';
 import { Get, Post } from '../lapis_server/request.methods';
 
-@RoutedController()
+@RoutedController('/cargo')
 export class CargoController extends Controller {
   @Get()
   async getAll(req) {

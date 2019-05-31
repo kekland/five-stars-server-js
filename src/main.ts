@@ -3,6 +3,7 @@ import { DatabaseService } from './database/database.service';
 import * as express from 'express'
 import { CargoController } from './controllers/cargo.controller';
 import bodyParser = require('body-parser');
+import { Controller } from './lapis_server/controller';
 
 const init = async () => {
   // Initialize the database
@@ -11,7 +12,14 @@ const init = async () => {
 
   // Attach modules
   app.use(bodyParser({ extended: true }))
-  app.use('/cargo', new CargoController().router)
+
+  const controllers: Controller[] = [
+    new CargoController(),
+  ]
+
+  controllers.forEach(controller => {
+    app.use(controller.route, controller.router)
+  });
 
   const port = 3008
   app.listen(port, () => {

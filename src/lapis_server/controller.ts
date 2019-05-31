@@ -6,16 +6,16 @@ import { ControllerRequestMethod, RequestMethod } from './request.methods';
 
 export class Controller {
   router: Router;
+  route: string;
 }
 
-export function RoutedController() {
+export function RoutedController(route: string = '/') {
   return function _DecoratorName<T extends new(...args: any[]) => {}>(constr: T) {
     return class extends constr {
       constructor(...args: any[]) {
         const meta: ControllerRequestMethod[] = Reflect.getMetadata(`${constr.name}:methods`, constr)
         super(...args)
 
-        const thisAsController = ((this as unknown) as Controller)
         const router = Router();
 
         meta.forEach((method) => {
@@ -33,7 +33,8 @@ export function RoutedController() {
           }
         });
 
-        ((this as unknown) as Controller).router = router
+        ((this as unknown) as Controller).router = router;
+        ((this as unknown) as Controller).route = route;
       }
     }
   }
