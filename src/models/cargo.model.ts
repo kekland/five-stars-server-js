@@ -16,10 +16,12 @@ export class Cargo extends Model<Cargo> {
   vehicleType: VehicleType;
 
   ownerId: string;
+  expired: boolean;
 
   constructor(data: {
     departure: NamedPositionWithTime, arrival: NamedPositionWithTime, weight: number,
     volume: number, price: number, description: string, images: string[], vehicleType: VehicleType, ownerId: string,
+    expired: boolean,
   }) {
     super()
     if (data == null) return;
@@ -32,6 +34,7 @@ export class Cargo extends Model<Cargo> {
     this.description = data.description
     this.images = data.images
     this.ownerId = data.ownerId
+    this.expired = data.expired
   }
 
   static fromAssignRequestObject(data: CargoAssignRequestObject, user: string) {
@@ -45,6 +48,7 @@ export class Cargo extends Model<Cargo> {
       vehicleType: data.vehicleType,
       volume: data.volume,
       weight: data.weight,
+      expired: false,
     })
   }
 }
