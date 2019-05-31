@@ -5,7 +5,7 @@ import { CargoAssignRequestObject } from '../data/request/cargo.assign.request.o
 import { validate } from 'class-validator';
 import { ValidationService } from '../lapis_server/utils';
 import { Cargo } from '../models/cargo.model';
-import { BadRequestException } from '../lapis_server/errors';
+import { BadRequestException, UnauthorizedException } from '../lapis_server/errors';
 import { Request } from 'express'
 import { Get, Post, Put } from '../lapis_server/request.methods';
 
@@ -19,9 +19,13 @@ export class CargoController extends Controller {
 
   @Post('/')
   async create(req) {
+    if (req.payload == null) {
+      throw new UnauthorizedException({ message: 'Not allowed to add cargo.' })
+    }
     const data = await ValidationService
       .transformAndValidate<CargoAssignRequestObject>(req.body, () => CargoAssignRequestObject)
-    const cargo = await DatabaseService.cargoStore.push().item(Cargo.fromAssignRequestObject(data, 'kekland')).run()
+
+    const cargo = await DatabaseService.cargoStore.push().item(Cargo.fromAssignRequestObject(data, req.payload.username)).run()
     return cargo
   }
 

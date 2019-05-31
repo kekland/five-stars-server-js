@@ -6,3 +6,12 @@ export class BadRequestException {
     this.message = message
   }
 }
+
+export class UnauthorizedException {
+  static code: number = 401;
+  message: any;
+
+  constructor(message: any) {
+    this.message = message
+  }
+}

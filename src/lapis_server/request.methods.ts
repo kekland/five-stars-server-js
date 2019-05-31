@@ -1,4 +1,4 @@
-import { BadRequestException } from './errors';
+import { BadRequestException, UnauthorizedException } from './errors';
 import { classToPlain } from 'class-transformer';
 
 export enum RequestMethod {
@@ -21,6 +21,9 @@ const requestMethod = async (fn, req, res) => {
   }
   catch (e) {
     if (e instanceof BadRequestException) {
+      res.status(BadRequestException.code).send(e.message)
+    }
+    if (e instanceof UnauthorizedException) {
       res.status(BadRequestException.code).send(e.message)
     }
     else {
