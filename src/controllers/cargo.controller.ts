@@ -13,7 +13,7 @@ import { Get, Post, Put, Delete } from '../lapis_server/request.methods';
 export class CargoController extends Controller {
   @Get('/')
   async getAll(req) {
-    const data = await DatabaseService.cargoStore.get().run()
+    const data = await DatabaseService.cargoStore.get().where(item => !item.expired).run()
     return data
   }
 
@@ -26,6 +26,10 @@ export class CargoController extends Controller {
       .transformAndValidate<CargoAssignRequestObject>(req.body, () => CargoAssignRequestObject)
 
     const cargo = await DatabaseService.cargoStore.push().item(Cargo.fromAssignRequestObject(data, req.payload.username)).run()
+
+    const user = await DatabaseService.userStore.get().where((item) => item.username === req.payload.username).first()
+    await DatabaseService.userStore.edit().item(user).with({ cargo: [...user.cargo, cargo.meta.id] }).run()
+
     return cargo
   }
 
