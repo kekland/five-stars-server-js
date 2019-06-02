@@ -6,6 +6,7 @@ import bodyParser = require('body-parser');
 import { Controller } from './lapis_server/controller';
 import { verify } from 'jsonwebtoken';
 import { AuthController } from './controllers/auth.controller';
+import { UserController } from './controllers/user.controller';
 
 const init = async () => {
   // Initialize the database
@@ -40,6 +41,7 @@ const init = async () => {
   const controllers: Controller[] = [
     new CargoController(),
     new AuthController(),
+    new UserController(),
   ]
 
   controllers.forEach(controller => {

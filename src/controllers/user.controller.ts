@@ -4,7 +4,7 @@ import { DatabaseService } from '../database/database.service';
 import { BadRequestException } from '../lapis_server/errors';
 
 @RoutedController('/user')
-class UserController extends Controller {
+export class UserController extends Controller {
   constructor() {
     super()
   }
