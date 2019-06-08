@@ -38,6 +38,8 @@ const init = async () => {
     }
   })
 
+  app.use((req, res, next) => { setTimeout(next, 2000) });
+
   const controllers: Controller[] = [
     new CargoController(),
     new AuthController(),
