@@ -9,6 +9,7 @@ import { BadRequestException, UnauthorizedException } from '../lapis_server/erro
 import { Request } from 'express'
 import { Get, Post, Put, Delete } from '../lapis_server/request.methods';
 import { CargoGetBatchedRequestObject } from '../data/request/cargo.getBatched.request.object';
+import { GoogleMaps } from '../maps/google.maps';
 
 @RoutedController('/cargo')
 export class CargoController extends Controller {
@@ -26,7 +27,9 @@ export class CargoController extends Controller {
     const data = await ValidationService
       .transformAndValidate<CargoAssignRequestObject>(req.body, () => CargoAssignRequestObject)
 
-    const cargo = await DatabaseService.cargoStore.push().item(Cargo.fromAssignRequestObject(data, req.payload.username)).run()
+    const route = await GoogleMaps.getDirections(data.departure.position, data.arrival.position)
+
+    const cargo = await DatabaseService.cargoStore.push().item(Cargo.fromAssignRequestObject(data, route, req.payload.username)).run()
 
     const user = await DatabaseService.userStore.get().where((item) => item.username === req.payload.username).first()
     await DatabaseService.userStore.edit().item(user).with({ cargo: [...user.cargo, cargo.meta.id] }).run()
@@ -62,6 +65,14 @@ export class CargoController extends Controller {
       throw new UnauthorizedException({ message: 'Not allowed to edit this cargo.' })
     }
 
+    let route = cargo.route
+    if (cargo.arrival.position.latitude !== data.arrival.position.latitude ||
+      cargo.arrival.position.longitude !== data.arrival.position.longitude ||
+      cargo.departure.position.latitude !== data.departure.position.latitude ||
+      cargo.departure.position.longitude !== data.departure.position.longitude) {
+      route = await GoogleMaps.getDirections(data.departure.position, data.arrival.position)
+    }
+
     await DatabaseService.cargoStore.edit().id(req.params.id).with({
       arrival: data.arrival,
       departure: data.departure,
@@ -70,6 +81,7 @@ export class CargoController extends Controller {
       price: data.price,
       vehicleType: data.vehicleType,
       volume: data.volume,
+      route,
       weight: data.weight,
     }).run()
 
