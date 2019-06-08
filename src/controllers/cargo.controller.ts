@@ -8,6 +8,7 @@ import { Cargo } from '../models/cargo.model';
 import { BadRequestException, UnauthorizedException } from '../lapis_server/errors';
 import { Request } from 'express'
 import { Get, Post, Put, Delete } from '../lapis_server/request.methods';
+import { CargoGetBatchedRequestObject } from '../data/request/cargo.getBatched.request.object';
 
 @RoutedController('/cargo')
 export class CargoController extends Controller {
@@ -29,6 +30,16 @@ export class CargoController extends Controller {
 
     const user = await DatabaseService.userStore.get().where((item) => item.username === req.payload.username).first()
     await DatabaseService.userStore.edit().item(user).with({ cargo: [...user.cargo, cargo.meta.id] }).run()
+
+    return cargo
+  }
+
+  @Post('/getBatched')
+  async getBatched(req) {
+    const data = await ValidationService
+      .transformAndValidate<CargoGetBatchedRequestObject>(req.body, () => CargoGetBatchedRequestObject)
+
+    const cargo = await DatabaseService.cargoStore.get().where((item) => data.values.includes(item.meta.id) && !item.expired).run()
 
     return cargo
   }
