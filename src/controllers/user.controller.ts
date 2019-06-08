@@ -4,6 +4,7 @@ import { DatabaseService } from '../database/database.service';
 import { BadRequestException } from '../lapis_server/errors';
 import { ValidationService } from '../lapis_server/utils';
 import { ProfileEditRequestObject } from '../data/request/profile.edit.request.object';
+import { UserProfileResponseObject } from '../data/response/user.profile.response.object';
 
 @RoutedController('/user')
 export class UserController extends Controller {
@@ -21,7 +22,7 @@ export class UserController extends Controller {
       throw new BadRequestException({ message: 'User with this username was not found.' })
     }
     else {
-      return user;
+      return new UserProfileResponseObject(user);
     }
   }
 
