@@ -1,111 +1,109 @@
 import { Controller, RoutedController } from '../lapis_server/controller';
 import { plainToClass, classToPlain } from 'class-transformer'
 import { DatabaseService } from '../database/database.service';
-import { CargoAssignRequestObject } from '../data/request/cargo.assign.request.object';
 import { validate } from 'class-validator';
 import { ValidationService } from '../lapis_server/utils';
-import { Cargo } from '../models/cargo.model';
 import { BadRequestException, UnauthorizedException } from '../lapis_server/errors';
 import { Request } from 'express'
 import { Get, Post, Put, Delete } from '../lapis_server/request.methods';
-import { CargoGetBatchedRequestObject } from '../data/request/cargo.getBatched.request.object';
+import { GetBatchedRequestObject } from '../data/request/getBatched.request.object';
 import { GoogleMaps } from '../maps/google.maps';
+import { VehicleAssignRequestObject } from '../data/request/vehicle.assign.request.object';
+import { Vehicle } from '../models/vehicle.model';
+import { NamedPosition } from '../models/named.position';
 
 @RoutedController('/vehicle')
 export class VehicleController extends Controller {
   @Get('/')
   async getAll(req) {
-    const data = await DatabaseService.cargoStore.get().where(item => !item.expired).run()
+    const data = await DatabaseService.vehicleStore.get().where(item => !item.expired).run()
     return data
   }
 
   @Post('/')
   async create(req) {
     if (req.payload == null) {
-      throw new UnauthorizedException({ message: 'Not allowed to add cargo.' })
+      throw new UnauthorizedException({ message: 'Not allowed to add vehicle.' })
     }
     const data = await ValidationService
-      .transformAndValidate<CargoAssignRequestObject>(req.body, () => CargoAssignRequestObject)
+      .transformAndValidate<VehicleAssignRequestObject>(req.body, () => VehicleAssignRequestObject)
 
-    const route = await GoogleMaps.getDirections(data.departure.position, data.arrival.position)
+    const route = await GoogleMaps.getDirections(data.departure, data.arrival)
 
-    const cargo = await DatabaseService.cargoStore.push().item(Cargo.fromAssignRequestObject(data, route, req.payload.username)).run()
+    const vehicle = await DatabaseService.vehicleStore.push().item(Vehicle.fromAssignRequestObject(data, route, req.payload.username)).run()
 
     const user = await DatabaseService.userStore.get().where((item) => item.username === req.payload.username).first()
-    await DatabaseService.userStore.edit().item(user).with({ cargo: [...user.cargo, cargo.meta.id] }).run()
+    await DatabaseService.userStore.edit().item(user).with({ vehicles: [...user.vehicles, vehicle.meta.id] }).run()
 
-    return cargo
+    return vehicle
   }
 
   @Post('/getBatched')
   async getBatched(req) {
     const data = await ValidationService
-      .transformAndValidate<CargoGetBatchedRequestObject>(req.body, () => CargoGetBatchedRequestObject)
+      .transformAndValidate<GetBatchedRequestObject>(req.body, () => GetBatchedRequestObject)
 
-    const cargo = await DatabaseService.cargoStore.get().where((item) => data.values.includes(item.meta.id) && !item.expired).run()
+    const vehicles = await DatabaseService.vehicleStore.get().where((item) => data.values.includes(item.meta.id) && !item.expired).run()
 
-    return cargo
+    return vehicles
   }
 
   @Put('/:id')
   async update(req) {
     if (req.payload == null) {
-      throw new UnauthorizedException({ message: 'Not allowed to edit this cargo.' })
+      throw new UnauthorizedException({ message: 'Not allowed to edit this vehicle.' })
     }
 
     const data = await ValidationService
-      .transformAndValidate<CargoAssignRequestObject>(req.body, () => CargoAssignRequestObject)
+      .transformAndValidate<VehicleAssignRequestObject>(req.body, () => VehicleAssignRequestObject)
 
-    let cargo = await DatabaseService.cargoStore.get().where((item) => item.meta.id === req.params.id).first()
+    let vehicle = await DatabaseService.vehicleStore.get().where((item) => item.meta.id === req.params.id).first()
 
-    if (cargo == null) {
-      throw new BadRequestException({ message: 'Cargo with this ID is not found.' })
+    if (vehicle == null) {
+      throw new BadRequestException({ message: 'Vehicle with this ID is not found.' })
     }
-    else if (cargo.ownerId !== req.payload.username) {
-      throw new UnauthorizedException({ message: 'Not allowed to edit this cargo.' })
-    }
-
-    let route = cargo.route
-    if (cargo.arrival.position.latitude !== data.arrival.position.latitude ||
-      cargo.arrival.position.longitude !== data.arrival.position.longitude ||
-      cargo.departure.position.latitude !== data.departure.position.latitude ||
-      cargo.departure.position.longitude !== data.departure.position.longitude) {
-      route = await GoogleMaps.getDirections(data.departure.position, data.arrival.position)
+    else if (vehicle.ownerId !== req.payload.username) {
+      throw new UnauthorizedException({ message: 'Not allowed to edit this vehicle.' })
     }
 
-    await DatabaseService.cargoStore.edit().id(req.params.id).with({
+    let route = vehicle.route
+    if (NamedPosition.arePositionsEqual(vehicle.departure, data.departure) ||
+        NamedPosition.arePositionsEqual(vehicle.arrival, data.arrival)) {
+      route = await GoogleMaps.getDirections(data.departure, data.arrival)
+    }
+
+    await DatabaseService.vehicleStore.edit().id(req.params.id).with({
       arrival: data.arrival,
       departure: data.departure,
       description: data.description,
       images: data.images,
-      price: data.price,
       vehicleType: data.vehicleType,
       volume: data.volume,
       route,
       weight: data.weight,
     }).run()
 
-    cargo = await DatabaseService.cargoStore.get().where((item) => item.meta.id === req.params.id).first()
+    vehicle = await DatabaseService.vehicleStore.get().where((item) => item.meta.id === req.params.id).first()
 
-    return cargo;
+    return vehicle;
   }
 
   @Delete('/:id')
   async delete(req) {
     if (req.payload == null) {
-      throw new UnauthorizedException({ message: 'Not allowed to delete this cargo.' })
+      throw new UnauthorizedException({ message: 'Not allowed to delete this vehicle.' })
     }
 
-    const cargo = await DatabaseService.cargoStore.get().where((item) => item.meta.id === req.params.id).first()
+    const vehicle = await DatabaseService.vehicleStore.get().where((item) => item.meta.id === req.params.id).first()
 
-    if (cargo == null) {
-      throw new BadRequestException({ message: 'Cargo with this ID is not found.' })
+    if (vehicle == null) {
+      throw new BadRequestException({ message: 'Vehicle with this ID is not found.' })
     }
-    else if (cargo.ownerId !== req.payload.username) {
-      throw new UnauthorizedException({ message: 'Not allowed to delete this cargo.' })
+    else if (vehicle.ownerId !== req.payload.username) {
+      throw new UnauthorizedException({ message: 'Not allowed to delete this vehicle.' })
     }
 
-    await DatabaseService.cargoStore.delete().id(req.params.id).run()
+    await DatabaseService.vehicleStore.delete().id(req.params.id).run()
 
     return { deleted: true }
   }

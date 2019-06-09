@@ -2,6 +2,7 @@ import { Model } from 'lapisdb'
 import { VehicleType } from './vehicle_type';
 import { NamedPosition } from './named.position';
 import { Route } from './cargo.model';
+import { VehicleAssignRequestObject } from '../data/request/vehicle.assign.request.object';
 
 export class Vehicle extends Model<Vehicle> {
   departure: NamedPosition;
@@ -33,5 +34,20 @@ export class Vehicle extends Model<Vehicle> {
     this.vehicleType = data.vehicleType
     this.ownerId = data.ownerId
     this.expired = data.expired
+  }
+
+  static fromAssignRequestObject(data: VehicleAssignRequestObject, route: Route, user: string) {
+    return new Vehicle({
+      arrival: data.arrival,
+      departure: data.departure,
+      description: data.description,
+      route,
+      images: data.images,
+      ownerId: user,
+      vehicleType: data.vehicleType,
+      volume: data.volume,
+      weight: data.weight,
+      expired: false,
+    })
   }
 }

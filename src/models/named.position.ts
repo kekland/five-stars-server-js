@@ -24,4 +24,8 @@ export class NamedPosition {
     this.longitude = data.longitude
     this.name = data.name
   }
+
+  static arePositionsEqual(a: NamedPosition, b: NamedPosition): boolean {
+    return a.latitude !== b.latitude || a.longitude !== b.longitude;
+  }
 }

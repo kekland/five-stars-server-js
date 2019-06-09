@@ -8,7 +8,7 @@ import { Cargo } from '../models/cargo.model';
 import { BadRequestException, UnauthorizedException } from '../lapis_server/errors';
 import { Request } from 'express'
 import { Get, Post, Put, Delete } from '../lapis_server/request.methods';
-import { CargoGetBatchedRequestObject } from '../data/request/cargo.getBatched.request.object';
+import { GetBatchedRequestObject } from '../data/request/getBatched.request.object';
 import { GoogleMaps } from '../maps/google.maps';
 
 @RoutedController('/cargo')
@@ -40,7 +40,7 @@ export class CargoController extends Controller {
   @Post('/getBatched')
   async getBatched(req) {
     const data = await ValidationService
-      .transformAndValidate<CargoGetBatchedRequestObject>(req.body, () => CargoGetBatchedRequestObject)
+      .transformAndValidate<GetBatchedRequestObject>(req.body, () => GetBatchedRequestObject)
 
     const cargo = await DatabaseService.cargoStore.get().where((item) => data.values.includes(item.meta.id) && !item.expired).run()
 
