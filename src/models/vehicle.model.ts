@@ -24,6 +24,7 @@ export class Vehicle extends Model<Vehicle> {
     volume: number, description: string, images: string[], vehicleType: VehicleType, ownerId: string, expired: boolean,
   }) {
     super()
+    if (data == null) return;
     this.departure = data.departure
     this.arrival = data.arrival
     this.route = data.route
