@@ -7,6 +7,7 @@ import { Controller } from './lapis_server/controller';
 import { verify } from 'jsonwebtoken';
 import { AuthController } from './controllers/auth.controller';
 import { UserController } from './controllers/user.controller';
+import { VehicleController } from './controllers/vehicle.controller';
 
 const init = async () => {
   // Initialize the database
@@ -42,6 +43,7 @@ const init = async () => {
 
   const controllers: Controller[] = [
     new CargoController(),
+    new VehicleController(),
     new AuthController(),
     new UserController(),
   ]
