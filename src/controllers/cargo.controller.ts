@@ -10,6 +10,7 @@ import { Request } from 'express'
 import { Get, Post, Put, Delete } from '../lapis_server/request.methods';
 import { GetBatchedRequestObject } from '../data/request/getBatched.request.object';
 import { GoogleMaps } from '../maps/google.maps';
+import { NamedPosition } from '../models/named.position';
 
 @RoutedController('/cargo')
 export class CargoController extends Controller {
@@ -66,13 +67,10 @@ export class CargoController extends Controller {
     }
 
     let route = cargo.route
-    if (cargo.arrival.position.latitude !== data.arrival.position.latitude ||
-      cargo.arrival.position.longitude !== data.arrival.position.longitude ||
-      cargo.departure.position.latitude !== data.departure.position.latitude ||
-      cargo.departure.position.longitude !== data.departure.position.longitude) {
+    if (NamedPosition.arePositionsEqual(cargo.departure.position, data.departure.position) ||
+        NamedPosition.arePositionsEqual(cargo.arrival.position, data.arrival.position)) {
       route = await GoogleMaps.getDirections(data.departure.position, data.arrival.position)
     }
-
     await DatabaseService.cargoStore.edit().id(req.params.id).with({
       arrival: data.arrival,
       departure: data.departure,
