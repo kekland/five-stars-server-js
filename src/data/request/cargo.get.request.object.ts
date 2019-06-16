@@ -2,19 +2,29 @@ import { Bounded } from '../../models/bounded.model';
 import { FilterObject } from './filterable.object';
 import { Cargo } from '../../models/cargo.model';
 import { VehicleType } from '../../models/vehicle_type';
+import * as Validator from 'class-validator'
+import { Type } from 'class-transformer';
 
 export class CargoGetRequestObject implements FilterObject<Cargo> {
   departure: string;
+
+  @Type(() => Date)
   departureTime: Date;
 
   arrival: string;
 
+  @Type(() => Bounded)
   weight: Bounded;
+  @Type(() => Bounded)
   volume: Bounded;
+  @Type(() => Bounded)
   distance: Bounded;
 
+  @Type(() => Bounded)
   width: Bounded;
+  @Type(() => Bounded)
   height: Bounded;
+  @Type(() => Bounded)
   length: Bounded;
 
   dangerous: boolean;
