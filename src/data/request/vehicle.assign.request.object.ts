@@ -3,6 +3,8 @@ import { VehicleType } from '../../models/vehicle_type';
 import * as Validator from 'class-validator'
 import { Type } from 'class-transformer';
 import { NamedPosition } from '../../models/named.position';
+import { Properties, Dimensions } from '../../models/properties.model';
+import { VehicleInformation } from '../../models/information.model';
 
 export class VehicleAssignRequestObject {
   @Validator.IsNotEmpty()
@@ -11,29 +13,31 @@ export class VehicleAssignRequestObject {
   departure: NamedPosition;
 
   @Validator.IsNotEmpty()
+  @Validator.IsDate()
+  @Type(() => Date)
+  departureTime: Date;
+
+  @Validator.IsNotEmpty()
   @Validator.ValidateNested()
   @Type(() => NamedPosition)
   arrival: NamedPosition;
 
   @Validator.IsNotEmpty()
-  @Validator.IsNumber()
-  @Validator.IsPositive()
-  weight: number;
+  @Validator.ValidateNested()
+  @Type(() => Properties)
+  properties: Properties;
 
   @Validator.IsNotEmpty()
-  @Validator.IsNumber()
-  @Validator.IsPositive()
-  volume: number;
+  @Validator.ValidateNested()
+  @Type(() => Dimensions)
+  dimensions: Dimensions;
 
   @Validator.IsNotEmpty()
-  @Validator.IsString()
-  description: string;
+  @Validator.ValidateNested()
+  @Type(() => VehicleInformation)
+  information: VehicleInformation;
 
   @Validator.IsNotEmpty()
-  @Validator.IsUrl({}, {each: true})
+  @Validator.IsUrl({}, { each: true })
   images: string[];
-
-  @Validator.IsNotEmpty()
-  @Validator.IsEnum(VehicleType)
-  vehicleType: VehicleType;
 }

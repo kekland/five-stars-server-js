@@ -3,52 +3,71 @@ import { VehicleType } from './vehicle_type';
 import { NamedPosition } from './named.position';
 import { Route } from './cargo.model';
 import { VehicleAssignRequestObject } from '../data/request/vehicle.assign.request.object';
+import { NamedPositionWithTime } from './named.position.with.time';
+import { Properties, Dimensions } from './properties.model';
+import { VehicleInformation } from './information.model';
+
+export interface IVehicleData {
+  departure: NamedPosition;
+  departureTime: Date;
+  arrival: NamedPosition;
+  route: Route;
+  properties: Properties;
+  dimensions: Dimensions;
+  information: VehicleInformation;
+  images: string[];
+  expired: boolean;
+  verified: boolean;
+  owner: string;
+}
 
 export class Vehicle extends Model<Vehicle> {
   departure: NamedPosition;
+  departureTime: Date;
+
   arrival: NamedPosition;
   route: Route;
 
-  weight: number;
-  volume: number;
-  description: string;
+  properties: Properties;
+  dimensions: Dimensions;
+  information: VehicleInformation;
+
   images: string[];
 
-  vehicleType: VehicleType;
-
-  ownerId: string;
   expired: boolean;
+  verified: boolean;
 
-  constructor(data: {
-    departure: NamedPosition, arrival: NamedPosition, weight: number, route: Route,
-    volume: number, description: string, images: string[], vehicleType: VehicleType, ownerId: string, expired: boolean,
-  }) {
+  owner: string;
+
+  constructor(data: IVehicleData) {
     super()
     if (data == null) return;
     this.departure = data.departure
+    this.departureTime = data.departureTime
     this.arrival = data.arrival
     this.route = data.route
-    this.weight = data.weight
-    this.volume = data.volume
-    this.description = data.description
+    this.properties = data.properties
+    this.dimensions = data.dimensions
+    this.information = data.information
     this.images = data.images
-    this.vehicleType = data.vehicleType
-    this.ownerId = data.ownerId
     this.expired = data.expired
+    this.verified = data.verified
+    this.owner = data.owner
   }
 
-  static fromAssignRequestObject(data: VehicleAssignRequestObject, route: Route, user: string) {
+  static fromAssignRequestObject(data: {body: VehicleAssignRequestObject, route: Route, user: string}) {
     return new Vehicle({
-      arrival: data.arrival,
-      departure: data.departure,
-      description: data.description,
-      route,
-      images: data.images,
-      ownerId: user,
-      vehicleType: data.vehicleType,
-      volume: data.volume,
-      weight: data.weight,
+      departure: data.body.departure,
+      departureTime: data.body.departureTime,
+      arrival: data.body.arrival,
+      route: data.route,
+      images: data.body.images,
+      dimensions: data.body.dimensions,
+      information: data.body.information,
+      properties: data.body.properties,
       expired: false,
+      verified: false,
+      owner: data.user,
     })
   }
 }
