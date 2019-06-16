@@ -1,7 +1,6 @@
 import { Router } from 'express';
 import { classToPlain } from 'class-transformer';
 import { BadRequestException } from './errors';
-import 'reflect-metadata';
 import { ControllerRequestMethod, RequestMethod } from './request.methods';
 
 export class Controller {

@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import { Cargo } from './models/cargo.model'
 import { DatabaseService } from './database/database.service';
 import * as express from 'express'

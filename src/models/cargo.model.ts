@@ -6,6 +6,7 @@ import { CargoInformation } from './information.model';
 import { Dimensions, Properties } from './properties.model';
 import { NamedPosition } from './named.position';
 import { Route } from './route.model';
+import { Type } from 'class-transformer';
 
 export interface ICargoData {
   departure: NamedPosition;
@@ -22,14 +23,25 @@ export interface ICargoData {
 }
 
 export class Cargo extends Model<Cargo> {
+  @Type(() => NamedPosition)
   departure: NamedPosition;
+
+  @Type(() => Date)
   departureTime: Date;
 
+  @Type(() => NamedPosition)
   arrival: NamedPosition;
+
+  @Type(() => Route)
   route: Route;
 
+  @Type(() => Properties)
   properties: Properties;
+
+  @Type(() => Dimensions)
   dimensions: Dimensions;
+
+  @Type(() => CargoInformation)
   information: CargoInformation;
 
   images: string[];
@@ -55,7 +67,7 @@ export class Cargo extends Model<Cargo> {
     this.owner = data.owner
   }
 
-  static fromAssignRequestObject(data: {body: CargoAssignRequestObject, route: Route, user: string}) {
+  static fromAssignRequestObject(data: { body: CargoAssignRequestObject, route: Route, user: string }) {
     return new Cargo({
       departure: data.body.departure,
       departureTime: data.body.departureTime,

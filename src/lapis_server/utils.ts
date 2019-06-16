@@ -7,11 +7,13 @@ export class ValidationService {
     return await validate(data, { validationError: { target: false, value: false }, forbidUnknownValues: true })
   }
 
-  static transformAndValidate = async<T> (data: any, type: () => any) => {
+  static transformAndValidate = async<T>(data: any, type: () => any, shouldValidate: boolean = true) => {
     const transformedData = plainToClass(type(), data)
-    const errors = await ValidationService.validate(transformedData)
-    if (errors.length > 0) {
-      throw new BadRequestException(errors)
+    if (shouldValidate) {
+      const errors = await ValidationService.validate(transformedData)
+      if (errors.length > 0) {
+        throw new BadRequestException(errors)
+      }
     }
 
     return (transformedData as unknown) as T

@@ -15,7 +15,7 @@ export class CargoController extends Controller {
   @Post('/get')
   async getAll(req) {
     const filterData = await ValidationService
-      .transformAndValidate<CargoGetRequestObject>(req.body, () => CargoGetRequestObject)
+      .transformAndValidate<CargoGetRequestObject>(req.body, () => CargoGetRequestObject, false)
     const now = moment().unix()
 
     const data = await DatabaseService.cargoStore.get().where(item => filterData.filter(item, { now })).run()
