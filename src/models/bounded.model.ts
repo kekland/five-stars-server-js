@@ -5,4 +5,8 @@ export class Bounded {
 
   @Validator.IsNumber()
   upper: number;
+
+  doesFit(value: number): boolean {
+    return (this.lower <= value && value <= this.upper);
+  }
 }
