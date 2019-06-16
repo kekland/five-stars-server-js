@@ -68,7 +68,7 @@ export class CargoController extends Controller {
 
     let route = cargo.route
     if (NamedPosition.arePositionsEqual(cargo.departure.position, data.departure.position) ||
-        NamedPosition.arePositionsEqual(cargo.arrival.position, data.arrival.position)) {
+      NamedPosition.arePositionsEqual(cargo.arrival.position, data.arrival.position)) {
       route = await GoogleMaps.getDirections(data.departure.position, data.arrival.position)
     }
     await DatabaseService.cargoStore.edit().id(req.params.id).with({
@@ -94,13 +94,11 @@ export class CargoController extends Controller {
       throw new UnauthorizedException({ message: 'Not allowed to delete this cargo.' })
     }
 
-    const cargo = await DatabaseService.cargoStore.get().where((item) => item.meta.id === req.params.id).first()
+    const cargo = await DatabaseService.cargoStore.get()
+      .where((item) => item.meta.id === req.params.id && item.owner === req.payload.username).first()
 
     if (cargo == null) {
-      throw new BadRequestException({ message: 'Cargo with this ID is not found.' })
-    }
-    else if (cargo.ownerId !== req.payload.username) {
-      throw new UnauthorizedException({ message: 'Not allowed to delete this cargo.' })
+      throw new BadRequestException({ message: 'Cargo with this ID was not found.' })
     }
 
     await DatabaseService.cargoStore.delete().id(req.params.id).run()
