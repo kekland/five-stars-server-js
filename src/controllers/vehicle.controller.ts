@@ -16,7 +16,7 @@ import { NamedPosition } from '../models/named.position';
 export class VehicleController extends Controller {
   @Get('/')
   async getAll(req) {
-    const data = await DatabaseService.vehicleStore.get().where(item => !item.expired).run()
+    const data = await DatabaseService.vehicleStore.get().where(item => !item.archived).run()
     return data
   }
 
@@ -43,7 +43,7 @@ export class VehicleController extends Controller {
     const data = await ValidationService
       .transformAndValidate<GetBatchedRequestObject>(req.body, () => GetBatchedRequestObject)
 
-    const vehicles = await DatabaseService.vehicleStore.get().where((item) => data.values.includes(item.meta.id) && !item.expired).run()
+    const vehicles = await DatabaseService.vehicleStore.get().where((item) => data.values.includes(item.meta.id) && !item.archived).run()
 
     return vehicles
   }

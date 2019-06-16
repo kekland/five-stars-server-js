@@ -16,7 +16,7 @@ export interface ICargoData {
   dimensions: Dimensions;
   information: CargoInformation;
   images: string[];
-  expired: boolean;
+  archived: boolean;
   verified: boolean;
   owner: string;
 }
@@ -34,7 +34,7 @@ export class Cargo extends Model<Cargo> {
 
   images: string[];
 
-  expired: boolean;
+  archived: boolean;
   verified: boolean;
 
   owner: string;
@@ -50,7 +50,7 @@ export class Cargo extends Model<Cargo> {
     this.dimensions = data.dimensions
     this.information = data.information
     this.images = data.images
-    this.expired = data.expired
+    this.archived = data.archived
     this.verified = data.verified
     this.owner = data.owner
   }
@@ -65,7 +65,7 @@ export class Cargo extends Model<Cargo> {
       dimensions: data.body.dimensions,
       information: data.body.information,
       properties: data.body.properties,
-      expired: false,
+      archived: false,
       verified: false,
       owner: data.user,
     })

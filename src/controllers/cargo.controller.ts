@@ -1,22 +1,24 @@
 import { Controller, RoutedController } from '../lapis_server/controller';
-import { plainToClass, classToPlain } from 'class-transformer'
 import { DatabaseService } from '../database/database.service';
 import { CargoAssignRequestObject } from '../data/request/cargo.assign.request.object';
-import { validate } from 'class-validator';
 import { ValidationService } from '../lapis_server/utils';
 import { Cargo } from '../models/cargo.model';
 import { BadRequestException, UnauthorizedException } from '../lapis_server/errors';
-import { Request } from 'express'
-import { Get, Post, Put, Delete } from '../lapis_server/request.methods';
-import { GetBatchedRequestObject } from '../data/request/getBatched.request.object';
+import { Post, Put, Delete } from '../lapis_server/request.methods';
 import { GoogleMaps } from '../maps/google.maps';
 import { NamedPosition } from '../models/named.position';
+import * as moment from 'moment';
+import { CargoGetRequestObject } from '../data/request/cargo.get.request.object';
 
 @RoutedController('/cargo')
 export class CargoController extends Controller {
-  @Get('/')
+  @Post('/get')
   async getAll(req) {
-    const data = await DatabaseService.cargoStore.get().where(item => !item.expired).run()
+    const filterData = await ValidationService
+      .transformAndValidate<CargoGetRequestObject>(req.body, () => CargoGetRequestObject)
+    const now = moment().unix()
+
+    const data = await DatabaseService.cargoStore.get().where(item => filterData.filter(item, { now })).run()
     return data
   }
 
@@ -28,22 +30,12 @@ export class CargoController extends Controller {
     const data = await ValidationService
       .transformAndValidate<CargoAssignRequestObject>(req.body, () => CargoAssignRequestObject)
 
-    const route = await GoogleMaps.getDirections(data.departure.position, data.arrival.position)
+    const route = await GoogleMaps.getDirections(data.departure, data.arrival)
 
-    const cargo = await DatabaseService.cargoStore.push().item(Cargo.fromAssignRequestObject(data, route, req.payload.username)).run()
+    const cargo = await DatabaseService.cargoStore.push().item(Cargo.fromAssignRequestObject({ body: data, route, user: req.payload.username })).run()
 
     const user = await DatabaseService.userStore.get().where((item) => item.username === req.payload.username).first()
     await DatabaseService.userStore.edit().item(user).with({ cargo: [...user.cargo, cargo.meta.id] }).run()
-
-    return cargo
-  }
-
-  @Post('/getBatched')
-  async getBatched(req) {
-    const data = await ValidationService
-      .transformAndValidate<GetBatchedRequestObject>(req.body, () => GetBatchedRequestObject)
-
-    const cargo = await DatabaseService.cargoStore.get().where((item) => data.values.includes(item.meta.id) && !item.expired).run()
 
     return cargo
   }
@@ -57,30 +49,26 @@ export class CargoController extends Controller {
     const data = await ValidationService
       .transformAndValidate<CargoAssignRequestObject>(req.body, () => CargoAssignRequestObject)
 
-    let cargo = await DatabaseService.cargoStore.get().where((item) => item.meta.id === req.params.id).first()
+    let cargo = await DatabaseService.cargoStore.get().where((item) => item.meta.id === req.params.id && item.owner === req.payload.username).first()
 
     if (cargo == null) {
       throw new BadRequestException({ message: 'Cargo with this ID is not found.' })
     }
-    else if (cargo.ownerId !== req.payload.username) {
-      throw new UnauthorizedException({ message: 'Not allowed to edit this cargo.' })
-    }
 
     let route = cargo.route
-    if (NamedPosition.arePositionsEqual(cargo.departure.position, data.departure.position) ||
-      NamedPosition.arePositionsEqual(cargo.arrival.position, data.arrival.position)) {
-      route = await GoogleMaps.getDirections(data.departure.position, data.arrival.position)
+    if (NamedPosition.arePositionsEqual(cargo.departure, data.departure) ||
+      NamedPosition.arePositionsEqual(cargo.arrival, data.arrival)) {
+      route = await GoogleMaps.getDirections(data.departure, data.arrival)
     }
     await DatabaseService.cargoStore.edit().id(req.params.id).with({
       arrival: data.arrival,
       departure: data.departure,
-      description: data.description,
+      departureTime: data.departureTime,
+      dimensions: data.dimensions,
       images: data.images,
-      price: data.price,
-      vehicleType: data.vehicleType,
-      volume: data.volume,
-      route,
-      weight: data.weight,
+      information: data.information,
+      properties: data.properties,
+      verified: false,
     }).run()
 
     cargo = await DatabaseService.cargoStore.get().where((item) => item.meta.id === req.params.id).first()

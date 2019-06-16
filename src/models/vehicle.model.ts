@@ -14,7 +14,7 @@ export interface IVehicleData {
   dimensions: Dimensions;
   information: VehicleInformation;
   images: string[];
-  expired: boolean;
+  archived: boolean;
   verified: boolean;
   owner: string;
 }
@@ -32,7 +32,7 @@ export class Vehicle extends Model<Vehicle> {
 
   images: string[];
 
-  expired: boolean;
+  archived: boolean;
   verified: boolean;
 
   owner: string;
@@ -48,7 +48,7 @@ export class Vehicle extends Model<Vehicle> {
     this.dimensions = data.dimensions
     this.information = data.information
     this.images = data.images
-    this.expired = data.expired
+    this.archived = data.archived
     this.verified = data.verified
     this.owner = data.owner
   }
@@ -63,7 +63,7 @@ export class Vehicle extends Model<Vehicle> {
       dimensions: data.body.dimensions,
       information: data.body.information,
       properties: data.body.properties,
-      expired: false,
+      archived: false,
       verified: false,
       owner: data.user,
     })
