@@ -1,12 +1,12 @@
 import { Bounded } from '../../models/bounded.model';
 import { FilterObject } from './filterable.object';
-import { Cargo } from '../../models/cargo.model';
 import { VehicleType } from '../../models/vehicle_type';
 import * as Validator from 'class-validator'
 import { Type } from 'class-transformer';
 import { IFilter } from 'lapisdb/dist/database/filter/filter.types';
+import { Vehicle } from '../../models/vehicle.model';
 
-export class CargoGetRequestObject implements FilterObject<Cargo> {
+export class VehicleGetRequestObject implements FilterObject<Vehicle> {
   departure: string;
 
   @Type(() => Date)
@@ -28,7 +28,6 @@ export class CargoGetRequestObject implements FilterObject<Cargo> {
   @Type(() => Bounded)
   length: Bounded;
 
-  dangerous: boolean;
   archived: boolean;
   verified: boolean;
   removeOld: boolean;
@@ -39,7 +38,7 @@ export class CargoGetRequestObject implements FilterObject<Cargo> {
 
   identifiers: string[];
 
-  filter(data: IFilter<Cargo>, params: { now: number }): boolean {
+  filter(data: IFilter<Vehicle>, params: { now: number }): boolean {
     let value: boolean = true
     if (this.removeOld) {
       if (params.now - data.meta.created > this.oldThreshold) {
@@ -67,7 +66,6 @@ export class CargoGetRequestObject implements FilterObject<Cargo> {
     if (this.height != null) value = value && this.height.doesFit(data.dimensions.height);
     if (this.length != null) value = value && this.length.doesFit(data.dimensions.length);
 
-    if (this.dangerous != null) value = value && this.dangerous === data.information.dangerous;
     if (this.vehicleType != null) value = value && this.vehicleType === data.information.vehicleType;
     if (this.archived != null) value = value && this.archived === data.archived;
     if (this.verified != null) value = value && this.verified === data.verified;
