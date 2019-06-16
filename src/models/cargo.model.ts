@@ -2,66 +2,72 @@ import { Model } from 'lapisdb'
 import { NamedPositionWithTime } from './named.position.with.time';
 import { VehicleType } from './vehicle_type';
 import { CargoAssignRequestObject } from '../data/request/cargo.assign.request.object';
+import { CargoInformation } from './information.model';
+import { Dimensions, Properties } from './properties.model';
+import { NamedPosition } from './named.position';
+import { Route } from './route.model';
 
-export class Route {
-  polyline: string;
-  distance: number;
-
-  constructor(data: {polyline: string, distance: number}) {
-    this.polyline = data.polyline
-    this.distance = data.distance
-  }
+export interface ICargoData {
+  departure: NamedPosition;
+  departureTime: Date;
+  arrival: NamedPosition;
+  route: Route;
+  properties: Properties;
+  dimensions: Dimensions;
+  information: CargoInformation;
+  images: string[];
+  expired: boolean;
+  verified: boolean;
+  owner: string;
 }
 
 export class Cargo extends Model<Cargo> {
-  departure: NamedPositionWithTime;
-  arrival: NamedPositionWithTime;
+  departure: NamedPosition;
+  departureTime: Date;
+
+  arrival: NamedPosition;
   route: Route;
 
-  weight: number;
-  volume: number;
-  price: number;
-  description: string;
+  properties: Properties;
+  dimensions: Dimensions;
+  information: CargoInformation;
+
   images: string[];
 
-  vehicleType: VehicleType;
-
-  ownerId: string;
   expired: boolean;
+  verified: boolean;
 
-  constructor(data: {
-    departure: NamedPositionWithTime, arrival: NamedPositionWithTime, weight: number, route: Route,
-    volume: number, price: number, description: string, images: string[], vehicleType: VehicleType, ownerId: string,
-    expired: boolean,
-  }) {
+  owner: string;
+
+  constructor(data: ICargoData) {
     super()
     if (data == null) return;
     this.departure = data.departure
-    this.route = data.route
+    this.departureTime = data.departureTime
     this.arrival = data.arrival
-    this.weight = data.weight
-    this.volume = data.volume
-    this.price = data.price
-    this.vehicleType = data.vehicleType
-    this.description = data.description
+    this.route = data.route
+    this.properties = data.properties
+    this.dimensions = data.dimensions
+    this.information = data.information
     this.images = data.images
-    this.ownerId = data.ownerId
     this.expired = data.expired
+    this.verified = data.verified
+    this.owner = data.owner
   }
 
-  static fromAssignRequestObject(data: CargoAssignRequestObject, route: Route, user: string) {
+  static fromAssignRequestObject(data: {body: CargoAssignRequestObject, route: Route, user: string}) {
     return new Cargo({
-      arrival: data.arrival,
-      departure: data.departure,
-      description: data.description,
-      route,
-      images: data.images,
-      ownerId: user,
-      price: data.price,
-      vehicleType: data.vehicleType,
-      volume: data.volume,
-      weight: data.weight,
+      departure: data.body.departure,
+      departureTime: data.body.departureTime,
+      arrival: data.body.arrival,
+      route: data.route,
+      images: data.body.images,
+      dimensions: data.body.dimensions,
+      information: data.body.information,
+      properties: data.body.properties,
       expired: false,
+      verified: false,
+      owner: data.user,
     })
   }
 }

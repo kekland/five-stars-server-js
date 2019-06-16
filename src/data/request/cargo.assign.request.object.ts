@@ -2,42 +2,42 @@ import { NamedPositionWithTime } from '../../models/named.position.with.time';
 import { VehicleType } from '../../models/vehicle_type';
 import * as Validator from 'class-validator'
 import { Type } from 'class-transformer';
+import { CargoInformation } from '../../models/information.model';
+import { Dimensions, Properties } from '../../models/properties.model';
+import { NamedPosition } from '../../models/named.position';
 
 export class CargoAssignRequestObject {
   @Validator.IsNotEmpty()
   @Validator.ValidateNested()
-  @Type(() => NamedPositionWithTime)
-  departure: NamedPositionWithTime;
+  @Type(() => NamedPosition)
+  departure: NamedPosition;
+
+  @Validator.IsNotEmpty()
+  @Validator.IsDate()
+  @Type(() => Date)
+  departureTime: Date;
 
   @Validator.IsNotEmpty()
   @Validator.ValidateNested()
-  @Type(() => NamedPositionWithTime)
-  arrival: NamedPositionWithTime;
+  @Type(() => NamedPosition)
+  arrival: NamedPosition;
 
   @Validator.IsNotEmpty()
-  @Validator.IsNumber()
-  @Validator.IsPositive()
-  weight: number;
+  @Validator.ValidateNested()
+  @Type(() => Properties)
+  properties: Properties;
 
   @Validator.IsNotEmpty()
-  @Validator.IsNumber()
-  @Validator.IsPositive()
-  volume: number;
+  @Validator.ValidateNested()
+  @Type(() => Dimensions)
+  dimensions: Dimensions;
 
   @Validator.IsNotEmpty()
-  @Validator.IsNumber()
-  @Validator.IsPositive()
-  price: number;
+  @Validator.ValidateNested()
+  @Type(() => CargoInformation)
+  information: CargoInformation;
 
   @Validator.IsNotEmpty()
-  @Validator.IsString()
-  description: string;
-
-  @Validator.IsNotEmpty()
-  @Validator.IsUrl({}, {each: true})
+  @Validator.IsUrl({}, { each: true })
   images: string[];
-
-  @Validator.IsNotEmpty()
-  @Validator.IsEnum(VehicleType)
-  vehicleType: VehicleType;
 }
