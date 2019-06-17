@@ -9,24 +9,24 @@ import { IFilter } from 'lapisdb/dist/database/filter/filter.types';
 export class CargoGetRequestObject implements FilterObject<Cargo> {
   departure: string;
 
-  @Type(() => Date)
-  departureTime: Date;
+  @Type(() => Bounded)
+  departureTime: Bounded<Date>;
 
   arrival: string;
 
   @Type(() => Bounded)
-  weight: Bounded;
+  weight: Bounded<number>;
   @Type(() => Bounded)
-  volume: Bounded;
+  volume: Bounded<number>;
   @Type(() => Bounded)
-  distance: Bounded;
+  distance: Bounded<number>;
 
   @Type(() => Bounded)
-  width: Bounded;
+  width: Bounded<number>;
   @Type(() => Bounded)
-  height: Bounded;
+  height: Bounded<number>;
   @Type(() => Bounded)
-  length: Bounded;
+  length: Bounded<number>;
 
   dangerous: boolean;
   archived: boolean;
@@ -39,11 +39,14 @@ export class CargoGetRequestObject implements FilterObject<Cargo> {
 
   identifiers: string[];
 
-  areDaysEqual(t: any): boolean {
+  isInDayRange(t: any): boolean {
     const time: Date = new Date(t)
-    return time.getDate() === this.departureTime.getDate() &&
-      time.getMonth() === this.departureTime.getMonth() &&
-      time.getUTCFullYear() === this.departureTime.getUTCFullYear()
+
+    const timestamp = time.getMilliseconds()
+    const lowerBound = this.departureTime.lower.getMilliseconds()
+    const upperBound = this.departureTime.upper.getMilliseconds()
+
+    return (lowerBound <= timestamp) && (timestamp <= upperBound);
   }
 
   filter(data: IFilter<Cargo>, params: { now: number }): boolean {
@@ -61,7 +64,7 @@ export class CargoGetRequestObject implements FilterObject<Cargo> {
     }
 
     if (this.departure != null) value = value && data.departure.name === this.departure;
-    if (this.departureTime != null) value = value && this.areDaysEqual(data.departureTime);
+    if (this.departureTime != null) value = value && this.isInDayRange(data.departureTime);
     if (this.arrival != null) value = value && data.arrival.name === this.arrival;
     if (this.weight != null) value = value && this.weight.doesFit(data.properties.weight);
     if (this.volume != null) value = value && this.volume.doesFit(data.properties.volume);
