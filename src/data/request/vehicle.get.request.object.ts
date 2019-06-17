@@ -15,18 +15,18 @@ export class VehicleGetRequestObject implements FilterObject<Vehicle> {
   arrival: string;
 
   @Type(() => Bounded)
-  weight: Bounded;
+  weight: Bounded<number>;
   @Type(() => Bounded)
-  volume: Bounded;
+  volume: Bounded<number>;
   @Type(() => Bounded)
-  distance: Bounded;
+  distance: Bounded<number>;
 
   @Type(() => Bounded)
-  width: Bounded;
+  width: Bounded<number>;
   @Type(() => Bounded)
-  height: Bounded;
+  height: Bounded<number>;
   @Type(() => Bounded)
-  length: Bounded;
+  length: Bounded<number>;
 
   archived: boolean;
   verified: boolean;

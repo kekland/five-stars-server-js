@@ -5,6 +5,7 @@ import { VehicleType } from '../../models/vehicle_type';
 import * as Validator from 'class-validator'
 import { Type } from 'class-transformer';
 import { IFilter } from 'lapisdb/dist/database/filter/filter.types';
+import moment = require('moment');
 
 export class CargoGetRequestObject implements FilterObject<Cargo> {
   departure: string;
@@ -40,11 +41,9 @@ export class CargoGetRequestObject implements FilterObject<Cargo> {
   identifiers: string[];
 
   isInDayRange(t: any): boolean {
-    const time: Date = new Date(t)
-
-    const timestamp = time.getMilliseconds()
-    const lowerBound = this.departureTime.lower.getMilliseconds()
-    const upperBound = this.departureTime.upper.getMilliseconds()
+    const timestamp = moment(t).unix()
+    const lowerBound = moment(this.departureTime.lower).unix()
+    const upperBound = moment(this.departureTime.upper).unix()
 
     return (lowerBound <= timestamp) && (timestamp <= upperBound);
   }
