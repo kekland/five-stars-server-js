@@ -1,7 +1,7 @@
 import { Model } from 'lapisdb'
 import { NamedPositionWithTime } from '../shared/named.position.with.time';
 import { VehicleType } from '../shared/vehicle_type';
-import { CargoAssignRequestObject } from '../../data/request/cargo.assign.request.object';
+import { CargoAssignRequestObject } from '../../data/request/cargo/cargo.assign.request.object';
 import { CargoInformation } from '../shared/information.model';
 import { Dimensions, Properties } from '../shared/properties.model';
 import { NamedPosition } from '../shared/named.position';

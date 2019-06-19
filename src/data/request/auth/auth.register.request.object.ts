@@ -1,4 +1,4 @@
-import { Name } from '../../models/shared/name';
+import { Name } from '../../../models/shared/name';
 import * as Validator from 'class-validator'
 import { Type } from 'class-transformer';
 

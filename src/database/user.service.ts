@@ -1,6 +1,6 @@
 import { User } from '../models/user/user.model';
 import { DatabaseService } from './database.service';
-import { AuthLoginRequestObject } from '../data/request/auth.login.request.object';
+import { AuthLoginRequestObject } from '../data/request/auth/auth.login.request.object';
 import { hashSync, compareSync } from 'bcrypt';
 
 export interface UserAvailability {

@@ -1,15 +1,15 @@
 import { RoutedController, Controller } from '../lapis_server/controller';
 import { Post } from '../lapis_server/request.methods';
 import { ValidationService } from '../lapis_server/utils';
-import { AuthRegisterRequestObject } from '../data/request/auth.register.request.object';
+import { AuthRegisterRequestObject } from '../data/request/auth/auth.register.request.object';
 import { DatabaseService } from '../database/database.service';
 import { User } from '../models/user/user.model';
 import { BadRequestException } from '../lapis_server/errors';
 import { UserService } from '../database/user.service';
-import { AuthAvailabilityRequestObject } from '../data/request/auth.availability.request.object';
+import { AuthAvailabilityRequestObject } from '../data/request/auth/auth.availability.request.object';
 import { sign, decode, verify } from 'jsonwebtoken'
 import { Request } from 'express'
-import { AuthLoginRequestObject } from '../data/request/auth.login.request.object';
+import { AuthLoginRequestObject } from '../data/request/auth/auth.login.request.object';
 
 @RoutedController('/auth')
 export class AuthController extends Controller {

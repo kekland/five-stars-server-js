@@ -1,12 +1,12 @@
-import { NamedPositionWithTime } from '../../models/shared/named.position.with.time';
-import { VehicleType } from '../../models/shared/vehicle_type';
+import { NamedPositionWithTime } from '../../../models/shared/named.position.with.time';
+import { VehicleType } from '../../../models/shared/vehicle_type';
 import * as Validator from 'class-validator'
 import { Type } from 'class-transformer';
-import { NamedPosition } from '../../models/shared/named.position';
-import { Properties, Dimensions } from '../../models/shared/properties.model';
-import { VehicleInformation } from '../../models/shared/information.model';
+import { CargoInformation } from '../../../models/shared/information.model';
+import { Dimensions, Properties } from '../../../models/shared/properties.model';
+import { NamedPosition } from '../../../models/shared/named.position';
 
-export class VehicleAssignRequestObject {
+export class CargoAssignRequestObject {
   @Validator.IsNotEmpty()
   @Validator.ValidateNested()
   @Type(() => NamedPosition)
@@ -34,8 +34,8 @@ export class VehicleAssignRequestObject {
 
   @Validator.IsNotEmpty()
   @Validator.ValidateNested()
-  @Type(() => VehicleInformation)
-  information: VehicleInformation;
+  @Type(() => CargoInformation)
+  information: CargoInformation;
 
   @Validator.IsNotEmpty()
   @Validator.IsUrl({}, { each: true })

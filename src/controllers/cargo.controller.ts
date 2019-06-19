@@ -1,6 +1,6 @@
 import { Controller, RoutedController } from '../lapis_server/controller';
 import { DatabaseService } from '../database/database.service';
-import { CargoAssignRequestObject } from '../data/request/cargo.assign.request.object';
+import { CargoAssignRequestObject } from '../data/request/cargo/cargo.assign.request.object';
 import { ValidationService } from '../lapis_server/utils';
 import { Cargo } from '../models/cargo/cargo.model';
 import { BadRequestException, UnauthorizedException } from '../lapis_server/errors';
@@ -8,7 +8,7 @@ import { Post, Put, Delete } from '../lapis_server/request.methods';
 import { GoogleMaps } from '../maps/google.maps';
 import { NamedPosition } from '../models/shared/named.position';
 import * as moment from 'moment';
-import { CargoGetRequestObject } from '../data/request/cargo.get.request.object';
+import { CargoGetRequestObject } from '../data/request/cargo/cargo.get.request.object';
 
 @RoutedController('/cargo')
 export class CargoController extends Controller {

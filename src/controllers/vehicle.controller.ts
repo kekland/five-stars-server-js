@@ -6,9 +6,9 @@ import { Post, Put, Delete } from '../lapis_server/request.methods';
 import { GoogleMaps } from '../maps/google.maps';
 import { NamedPosition } from '../models/shared/named.position';
 import * as moment from 'moment';
-import { VehicleGetRequestObject } from '../data/request/vehicle.get.request.object';
-import { VehicleAssignRequestObject } from '../data/request/vehicle.assign.request.object';
 import { Vehicle } from '../models/vehicle/vehicle.model';
+import { VehicleAssignRequestObject } from '../data/request/vehicle/vehicle.assign.request.object';
+import { VehicleGetRequestObject } from '../data/request/vehicle/vehicle.get.request.object';
 
 @RoutedController('/vehicle')
 export class VehicleController extends Controller {

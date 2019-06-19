@@ -1,7 +1,7 @@
 import { Model } from 'lapisdb';
 import { Name } from '../shared/name';
 import { hashSync, genSaltSync, genSalt } from 'bcrypt'
-import { AuthRegisterRequestObject } from '../../data/request/auth.register.request.object';
+import { AuthRegisterRequestObject } from '../../data/request/auth/auth.register.request.object';
 
 export class User extends Model<User> {
   username: string;
