@@ -17,8 +17,8 @@ export class VehicleController extends Controller {
     const filterData = await ValidationService
       .transformAndValidate<VehicleGetRequestObject>(req.body, () => VehicleGetRequestObject)
     const now = moment().unix()
-
     const data = await DatabaseService.vehicleStore.get().where(item => filterData.filter(item, { now })).run()
+
     return data
   }
 

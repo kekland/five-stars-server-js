@@ -1,11 +1,10 @@
 import { Bounded } from '../../../models/shared/bounded.model';
-import { FilterObject } from '../filterable.object';
-import { Cargo as Vehicle } from '../../../models/cargo/cargo.model';
-import { VehicleType } from '../../../models/shared/vehicle_type';
-import * as Validator from 'class-validator'
 import { Type } from 'class-transformer';
-import { IFilter } from 'lapisdb/dist/database/filter/filter.types';
+import { FilterObject } from '../filterable.object';
+import { Vehicle } from '../../../models/vehicle/vehicle.model';
+import { VehicleType } from '../../../models/shared/vehicle_type';
 import moment = require('moment');
+import { IFilter } from 'lapisdb/dist/database/filter/filter.types';
 
 export class VehicleGetRequestObject implements FilterObject<Vehicle> {
   departure: string;
