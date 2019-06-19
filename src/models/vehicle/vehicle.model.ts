@@ -1,9 +1,9 @@
 import { Model } from 'lapisdb'
 import { NamedPosition } from '../shared/named.position';
-import { VehicleAssignRequestObject } from '../../data/request/vehicle.assign.request.object';
 import { Properties, Dimensions } from '../shared/properties.model';
 import { VehicleInformation } from '../shared/information.model';
 import { Route } from '../shared/route.model';
+import { VehicleAssignRequestObject } from '../../data/request/vehicle/vehicle.assign.request.object';
 
 export interface IVehicleData {
   departure: NamedPosition;
