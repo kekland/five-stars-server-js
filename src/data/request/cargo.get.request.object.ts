@@ -1,7 +1,7 @@
-import { Bounded } from '../../models/bounded.model';
+import { Bounded } from '../../models/shared/bounded.model';
 import { FilterObject } from './filterable.object';
-import { Cargo } from '../../models/cargo.model';
-import { VehicleType } from '../../models/vehicle_type';
+import { Cargo } from '../../models/cargo/cargo.model';
+import { VehicleType } from '../../models/shared/vehicle_type';
 import * as Validator from 'class-validator'
 import { Type } from 'class-transformer';
 import { IFilter } from 'lapisdb/dist/database/filter/filter.types';

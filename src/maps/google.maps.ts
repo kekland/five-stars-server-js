@@ -1,7 +1,7 @@
-import { NamedPosition } from '../models/named.position';
+import { NamedPosition } from '../models/shared/named.position';
 import axios from 'axios'
 import { googleMapsKey } from '../secret';
-import { Route } from '../models/route.model';
+import { Route } from '../models/shared/route.model';
 
 export class GoogleMaps {
   static async getDirections(departure: NamedPosition, arrival: NamedPosition): Promise<Route> {

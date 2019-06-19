@@ -1,5 +1,5 @@
 import 'reflect-metadata';
-import { Cargo } from './models/cargo.model'
+import { Cargo } from './models/cargo/cargo.model'
 import { DatabaseService } from './database/database.service';
 import * as express from 'express'
 import { CargoController } from './controllers/cargo.controller';

@@ -1,10 +1,10 @@
-import { Bounded } from '../../models/bounded.model';
+import { Bounded } from '../../models/shared/bounded.model';
 import { FilterObject } from './filterable.object';
-import { VehicleType } from '../../models/vehicle_type';
+import { VehicleType } from '../../models/shared/vehicle_type';
 import * as Validator from 'class-validator'
 import { Type } from 'class-transformer';
 import { IFilter } from 'lapisdb/dist/database/filter/filter.types';
-import { Vehicle } from '../../models/vehicle.model';
+import { Vehicle } from '../../models/vehicle/vehicle.model';
 
 export class VehicleGetRequestObject implements FilterObject<Vehicle> {
   departure: string;

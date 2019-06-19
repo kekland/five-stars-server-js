@@ -1,4 +1,4 @@
-import { User } from '../models/user.model';
+import { User } from '../models/user/user.model';
 import { DatabaseService } from './database.service';
 import { AuthLoginRequestObject } from '../data/request/auth.login.request.object';
 import { hashSync, compareSync } from 'bcrypt';

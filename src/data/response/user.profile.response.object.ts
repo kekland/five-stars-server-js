@@ -1,6 +1,6 @@
-import { Name } from '../../models/name';
+import { Name } from '../../models/shared/name';
 import { IObjectMetadata } from 'lapisdb/dist/database/model/model';
-import { User } from '../../models/user.model';
+import { User } from '../../models/user/user.model';
 
 export class UserProfileResponseObject {
   meta: IObjectMetadata;

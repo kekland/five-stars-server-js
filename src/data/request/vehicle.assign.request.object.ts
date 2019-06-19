@@ -1,10 +1,10 @@
-import { NamedPositionWithTime } from '../../models/named.position.with.time';
-import { VehicleType } from '../../models/vehicle_type';
+import { NamedPositionWithTime } from '../../models/shared/named.position.with.time';
+import { VehicleType } from '../../models/shared/vehicle_type';
 import * as Validator from 'class-validator'
 import { Type } from 'class-transformer';
-import { NamedPosition } from '../../models/named.position';
-import { Properties, Dimensions } from '../../models/properties.model';
-import { VehicleInformation } from '../../models/information.model';
+import { NamedPosition } from '../../models/shared/named.position';
+import { Properties, Dimensions } from '../../models/shared/properties.model';
+import { VehicleInformation } from '../../models/shared/information.model';
 
 export class VehicleAssignRequestObject {
   @Validator.IsNotEmpty()
