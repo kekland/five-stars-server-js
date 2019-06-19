@@ -24,7 +24,8 @@ export class User extends Model<User> {
 
   constructor(data: {
     username: string, hashedPassword: string, email: string, phoneNumber: string, name: Name,
-    cargo: string[], vehicles: string[], organization: string,
+    cargo: string[], vehicles: string[], organization: string, favoriteCargo: string[], favoriteVehicles: string[],
+    savedCargoData: string[], savedVehicleData: string[],
   }) {
     super()
     if (data == null) return;
@@ -36,6 +37,10 @@ export class User extends Model<User> {
     this.name = data.name
     this.cargo = data.cargo
     this.vehicles = data.vehicles
+    this.favoriteCargo = data.favoriteCargo
+    this.favoriteVehicles = data.favoriteVehicles
+    this.savedCargoData = data.savedCargoData
+    this.savedVehicleData = data.savedVehicleData
   }
 
   static fromAuthRegisterRequestObject(data: AuthRegisterRequestObject) {
@@ -48,6 +53,10 @@ export class User extends Model<User> {
       phoneNumber: data.phoneNumber,
       cargo: [],
       vehicles: [],
+      favoriteCargo: [],
+      favoriteVehicles: [],
+      savedCargoData: [],
+      savedVehicleData: [],
     });
   }
 }
