@@ -47,7 +47,7 @@ export class UserController extends Controller {
     }
   }
 
-  @Get('/:id/cargo/favorite')
+  @Get('/:username/cargo/favorite')
   async getFavoriteCargo(req) {
     const username = req.params.username
 
@@ -60,7 +60,7 @@ export class UserController extends Controller {
     return cargos
   }
 
-  @Get('/:id/cargo')
+  @Get('/:username/cargo')
   async getCargos(req) {
     const username = req.params.username
 
@@ -73,7 +73,7 @@ export class UserController extends Controller {
     return cargos
   }
 
-  @Get('/:id/vehicle/favorite')
+  @Get('/:username/vehicle/favorite')
   async getFavoriteVehicle(req) {
     const username = req.params.username
 
@@ -86,7 +86,7 @@ export class UserController extends Controller {
     return vehicles
   }
 
-  @Get('/:id/vehicle')
+  @Get('/:username/vehicle')
   async getVehicles(req) {
     const username = req.params.username
 
