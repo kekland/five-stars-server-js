@@ -9,8 +9,15 @@ export class UserProfileResponseObject {
   phoneNumber: string;
   organization: string;
   name: Name;
+
   cargo: string[];
   vehicles: string[];
+
+  favoriteCargo: string[];
+  favoriteVehicles: string[];
+
+  savedCargoData: string[];
+  savedVehicleData: string[];
 
   constructor(data: User) {
     this.meta = data.meta
@@ -21,5 +28,9 @@ export class UserProfileResponseObject {
     this.name = data.name
     this.cargo = data.cargo
     this.vehicles = data.vehicles
+    this.favoriteCargo = data.favoriteCargo
+    this.favoriteVehicles = data.favoriteVehicles
+    this.savedCargoData = data.savedCargoData
+    this.savedVehicleData = data.savedVehicleData
   }
 }

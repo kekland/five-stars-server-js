@@ -46,4 +46,30 @@ export class UserController extends Controller {
       return user;
     }
   }
+
+  @Get(':id/favorite/cargo')
+  async getFavoriteCargo(req) {
+    const username = req.params.username
+
+    const user = await DatabaseService.userStore.get().where((item) => item.username === username).first()
+
+    if (user == null) {
+      throw new BadRequestException({ message: 'User with this username was not found.' })
+    }
+    const cargos = await DatabaseService.cargoStore.get().where(c => user.favoriteCargo.includes(c.meta.id)).run()
+    return cargos
+  }
+
+  @Get(':id/favorite/vehicle')
+  async getFavoriteVehicle(req) {
+    const username = req.params.username
+
+    const user = await DatabaseService.userStore.get().where((item) => item.username === username).first()
+
+    if (user == null) {
+      throw new BadRequestException({ message: 'User with this username was not found.' })
+    }
+    const vehicles = await DatabaseService.vehicleStore.get().where(v => user.favoriteVehicles.includes(v.meta.id)).run()
+    return vehicles
+  }
 }
