@@ -16,6 +16,12 @@ export class User extends Model<User> {
   cargo: string[];
   vehicles: string[];
 
+  favoriteCargo: string[];
+  favoriteVehicles: string[];
+
+  savedCargoData: string[];
+  savedVehicleData: string[];
+
   constructor(data: {
     username: string, hashedPassword: string, email: string, phoneNumber: string, name: Name,
     cargo: string[], vehicles: string[], organization: string,

@@ -40,6 +40,29 @@ export class CargoController extends Controller {
     return cargo
   }
 
+  @Post('/:id/favorite')
+  async favorite(req) {
+    if (req.payload == null) {
+      throw new UnauthorizedException({ message: 'Not allowed to edit this cargo.' })
+    }
+    const cargoId = req.params.id
+    const user = await DatabaseService.userStore.get().where(u => u.username === req.payload.username).first()
+    await DatabaseService.userStore.edit().item(user).with({ favoriteCargo: [...user.favoriteCargo, cargoId] });
+    return cargoId
+  }
+
+  @Post('/:id/unfavorite')
+  async unfavorite(req) {
+    if (req.payload == null) {
+      throw new UnauthorizedException({ message: 'Not allowed to edit this cargo.' })
+    }
+    const cargoId = req.params.id
+    const user = await DatabaseService.userStore.get().where(u => u.username === req.payload.username).first()
+    const index = user.favoriteCargo.indexOf(cargoId)
+    await DatabaseService.userStore.edit().item(user).with({ favoriteCargo: user.favoriteCargo.splice(index, 1) });
+    return cargoId
+  }
+
   @Put('/:id')
   async update(req) {
     if (req.payload == null) {

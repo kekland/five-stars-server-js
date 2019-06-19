@@ -41,6 +41,29 @@ export class VehicleController extends Controller {
     return vehicle
   }
 
+  @Post('/:id/favorite')
+  async favorite(req) {
+    if (req.payload == null) {
+      throw new UnauthorizedException({ message: 'Not allowed to edit this vehicle.' })
+    }
+    const vehicleId = req.params.id
+    const user = await DatabaseService.userStore.get().where(u => u.username === req.payload.username).first()
+    await DatabaseService.userStore.edit().item(user).with({ favoriteVehicles: [...user.favoriteVehicles, vehicleId] });
+    return vehicleId
+  }
+
+  @Post('/:id/unfavorite')
+  async unfavorite(req) {
+    if (req.payload == null) {
+      throw new UnauthorizedException({ message: 'Not allowed to edit this vehicle.' })
+    }
+    const vehicleId = req.params.id
+    const user = await DatabaseService.userStore.get().where(u => u.username === req.payload.username).first()
+    const index = user.favoriteVehicles.indexOf(vehicleId)
+    await DatabaseService.userStore.edit().item(user).with({ favoriteVehicles: user.favoriteVehicles.splice(index, 1) });
+    return vehicleId
+  }
+
   @Put('/:id')
   async update(req) {
     if (req.payload == null) {
