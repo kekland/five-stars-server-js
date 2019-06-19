@@ -81,8 +81,8 @@ export class VehicleController extends Controller {
     }
 
     let route = vehicle.route
-    if (NamedPosition.arePositionsEqual(vehicle.departure, data.departure) ||
-      NamedPosition.arePositionsEqual(vehicle.arrival, data.arrival)) {
+    if (NamedPosition.arePositionsDifferent(vehicle.departure, data.departure) ||
+      NamedPosition.arePositionsDifferent(vehicle.arrival, data.arrival)) {
       route = await GoogleMaps.getDirections(data.departure, data.arrival)
     }
     await DatabaseService.vehicleStore.edit().id(req.params.id).with({
@@ -93,6 +93,7 @@ export class VehicleController extends Controller {
       images: data.images,
       information: data.information,
       properties: data.properties,
+      route,
       verified: false,
     }).run()
 

@@ -79,8 +79,8 @@ export class CargoController extends Controller {
     }
 
     let route = cargo.route
-    if (NamedPosition.arePositionsEqual(cargo.departure, data.departure) ||
-      NamedPosition.arePositionsEqual(cargo.arrival, data.arrival)) {
+    if (NamedPosition.arePositionsDifferent(cargo.departure, data.departure) ||
+      NamedPosition.arePositionsDifferent(cargo.arrival, data.arrival)) {
       route = await GoogleMaps.getDirections(data.departure, data.arrival)
     }
     await DatabaseService.cargoStore.edit().id(req.params.id).with({
@@ -91,6 +91,7 @@ export class CargoController extends Controller {
       images: data.images,
       information: data.information,
       properties: data.properties,
+      route,
       verified: false,
     }).run()
 
