@@ -47,7 +47,7 @@ export class UserController extends Controller {
     }
   }
 
-  @Get(':id/favorite/cargo')
+  @Get(':id/cargo/favorite')
   async getFavoriteCargo(req) {
     const username = req.params.username
 
@@ -60,7 +60,20 @@ export class UserController extends Controller {
     return cargos
   }
 
-  @Get(':id/favorite/vehicle')
+  @Get(':id/cargo')
+  async getCargos(req) {
+    const username = req.params.username
+
+    const user = await DatabaseService.userStore.get().where((item) => item.username === username).first()
+
+    if (user == null) {
+      throw new BadRequestException({ message: 'User with this username was not found.' })
+    }
+    const cargos = await DatabaseService.cargoStore.get().where(c => user.cargo.includes(c.meta.id)).run()
+    return cargos
+  }
+
+  @Get(':id/vehicle/favorite')
   async getFavoriteVehicle(req) {
     const username = req.params.username
 
@@ -70,6 +83,19 @@ export class UserController extends Controller {
       throw new BadRequestException({ message: 'User with this username was not found.' })
     }
     const vehicles = await DatabaseService.vehicleStore.get().where(v => user.favoriteVehicles.includes(v.meta.id)).run()
+    return vehicles
+  }
+
+  @Get(':id/vehicle')
+  async getVehicles(req) {
+    const username = req.params.username
+
+    const user = await DatabaseService.userStore.get().where((item) => item.username === username).first()
+
+    if (user == null) {
+      throw new BadRequestException({ message: 'User with this username was not found.' })
+    }
+    const vehicles = await DatabaseService.vehicleStore.get().where(v => user.vehicles.includes(v.meta.id)).run()
     return vehicles
   }
 }
