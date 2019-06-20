@@ -50,7 +50,7 @@ export class VehicleController extends Controller {
     const user = await DatabaseService.userStore.get().where(u => u.username === req.payload.username).first()
 
     if (user.favoriteVehicles.includes(vehicleId)) return vehicleId;
-    await DatabaseService.userStore.edit().item(user).with({ favoriteVehicles: [...user.favoriteVehicles, vehicleId] });
+    await DatabaseService.userStore.edit().item(user).with({ favoriteVehicles: [...user.favoriteVehicles, vehicleId] }).run();
     return vehicleId
   }
 
@@ -64,7 +64,7 @@ export class VehicleController extends Controller {
 
     if (!user.favoriteVehicles.includes(vehicleId)) return vehicleId;
     const index = user.favoriteVehicles.indexOf(vehicleId)
-    await DatabaseService.userStore.edit().item(user).with({ favoriteVehicles: user.favoriteVehicles.splice(index, 1) });
+    await DatabaseService.userStore.edit().item(user).with({ favoriteVehicles: user.favoriteVehicles.splice(index, 1) }).run();
     return vehicleId
   }
 
