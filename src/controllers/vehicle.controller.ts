@@ -15,7 +15,7 @@ export class VehicleController extends Controller {
   @Post('/get')
   async getAll(req) {
     const filterData = await ValidationService
-      .transformAndValidate<VehicleGetRequestObject>(req.body, () => VehicleGetRequestObject)
+      .transformAndValidate<VehicleGetRequestObject>(req.body, () => VehicleGetRequestObject, false)
     const now = moment().unix()
     const data = await DatabaseService.vehicleStore.get().where(item => filterData.filter(item, { now })).run()
 
@@ -48,6 +48,8 @@ export class VehicleController extends Controller {
     }
     const vehicleId = req.params.id
     const user = await DatabaseService.userStore.get().where(u => u.username === req.payload.username).first()
+
+    if (user.favoriteVehicles.includes(vehicleId)) return vehicleId;
     await DatabaseService.userStore.edit().item(user).with({ favoriteVehicles: [...user.favoriteVehicles, vehicleId] });
     return vehicleId
   }
@@ -59,6 +61,8 @@ export class VehicleController extends Controller {
     }
     const vehicleId = req.params.id
     const user = await DatabaseService.userStore.get().where(u => u.username === req.payload.username).first()
+
+    if (!user.favoriteVehicles.includes(vehicleId)) return vehicleId;
     const index = user.favoriteVehicles.indexOf(vehicleId)
     await DatabaseService.userStore.edit().item(user).with({ favoriteVehicles: user.favoriteVehicles.splice(index, 1) });
     return vehicleId

@@ -47,7 +47,9 @@ export class CargoController extends Controller {
     }
     const cargoId = req.params.id
     const user = await DatabaseService.userStore.get().where(u => u.username === req.payload.username).first()
-    await DatabaseService.userStore.edit().item(user).with({ favoriteCargo: [...user.favoriteCargo, cargoId] });
+
+    if (user.favoriteCargo.includes(cargoId)) return cargoId;
+    await DatabaseService.userStore.edit().item(user).with({ favoriteCargo: [...user.favoriteCargo, cargoId] }).run();
     return cargoId
   }
 
@@ -58,8 +60,9 @@ export class CargoController extends Controller {
     }
     const cargoId = req.params.id
     const user = await DatabaseService.userStore.get().where(u => u.username === req.payload.username).first()
+    if (!user.favoriteCargo.includes(cargoId)) return cargoId;
     const index = user.favoriteCargo.indexOf(cargoId)
-    await DatabaseService.userStore.edit().item(user).with({ favoriteCargo: user.favoriteCargo.splice(index, 1) });
+    await DatabaseService.userStore.edit().item(user).with({ favoriteCargo: user.favoriteCargo.splice(index, 1) }).run();
     return cargoId
   }
 
