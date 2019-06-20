@@ -40,7 +40,7 @@ const init = async () => {
     }
   })
 
-  app.use((req, res, next) => { setTimeout(next, 2000) });
+  app.use((req, res, next) => { setTimeout(next, 0) });
 
   const controllers: Controller[] = [
     new CargoController(),
