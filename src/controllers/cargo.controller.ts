@@ -75,7 +75,8 @@ export class CargoController extends Controller {
     const data = await ValidationService
       .transformAndValidate<CargoAssignRequestObject>(req.body, () => CargoAssignRequestObject)
 
-    let cargo = await DatabaseService.cargoStore.get().where((item) => item.meta.id === req.params.id && item.owner === req.payload.username).first()
+    let cargo = await DatabaseService.cargoStore.get()
+      .where((item) => item.meta.id === req.params.id && item.owner === req.payload.username).first()
 
     if (cargo == null) {
       throw new BadRequestException({ message: 'Cargo with this ID is not found.' })
@@ -86,7 +87,8 @@ export class CargoController extends Controller {
       NamedPosition.arePositionsDifferent(cargo.arrival, data.arrival)) {
       route = await GoogleMaps.getDirections(data.departure, data.arrival)
     }
-    await DatabaseService.cargoStore.edit().id(req.params.id).with({
+
+    cargo = await (DatabaseService.cargoStore.edit().id(req.params.id).with({
       arrival: data.arrival,
       departure: data.departure,
       departureTime: data.departureTime,
@@ -96,9 +98,7 @@ export class CargoController extends Controller {
       properties: data.properties,
       route,
       verified: false,
-    }).run()
-
-    cargo = await DatabaseService.cargoStore.get().where((item) => item.meta.id === req.params.id).first()
+    }).edit())
 
     return cargo;
   }

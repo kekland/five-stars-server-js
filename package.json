@@ -22,11 +22,11 @@
   "homepage": "https://github.com/kekland/five-stars-server-js#readme",
   "devDependencies": {
     "@types/bcrypt": "^3.0.0",
-    "@types/express": "^4.16.1",
+    "@types/express": "^4.17.0",
     "@types/jsonwebtoken": "^8.3.2",
-    "gulp": "^4.0.0",
+    "gulp": "^4.0.2",
     "gulp-typescript": "^5.0.1",
-    "typescript": "^3.5.1"
+    "typescript": "^3.5.2"
   },
   "dependencies": {
     "axios": "^0.19.0",
@@ -35,7 +35,7 @@
     "class-validator": "^0.9.1",
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
-    "lapisdb": "^0.1.6",
+    "lapisdb": "^0.1.8",
     "reflect-metadata": "^0.1.13"
   }
 }

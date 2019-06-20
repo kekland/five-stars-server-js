@@ -89,7 +89,7 @@ export class VehicleController extends Controller {
       NamedPosition.arePositionsDifferent(vehicle.arrival, data.arrival)) {
       route = await GoogleMaps.getDirections(data.departure, data.arrival)
     }
-    await DatabaseService.vehicleStore.edit().id(req.params.id).with({
+    vehicle = await DatabaseService.vehicleStore.edit().id(req.params.id).with({
       arrival: data.arrival,
       departure: data.departure,
       departureTime: data.departureTime,
@@ -100,8 +100,6 @@ export class VehicleController extends Controller {
       route,
       verified: false,
     }).run()
-
-    vehicle = await DatabaseService.vehicleStore.get().where((item) => item.meta.id === req.params.id).first()
 
     return vehicle;
   }
