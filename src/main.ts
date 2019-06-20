@@ -9,6 +9,7 @@ import { verify } from 'jsonwebtoken';
 import { AuthController } from './controllers/auth.controller';
 import { UserController } from './controllers/user.controller';
 import { VehicleController } from './controllers/vehicle.controller';
+import { secretKey } from './secret';
 
 const init = async () => {
   // Initialize the database
@@ -23,7 +24,7 @@ const init = async () => {
       const parts = auth.split(' ')
       if (parts[0].toLowerCase() === 'bearer') {
         try {
-          const payload = verify(parts[1], 'my-secret-key');
+          const payload = verify(parts[1], secretKey);
           (req as any).payload = payload
           next()
         }

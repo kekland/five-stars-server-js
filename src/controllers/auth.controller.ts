@@ -10,6 +10,7 @@ import { AuthAvailabilityRequestObject } from '../data/request/auth/auth.availab
 import { sign, decode, verify } from 'jsonwebtoken'
 import { Request } from 'express'
 import { AuthLoginRequestObject } from '../data/request/auth/auth.login.request.object';
+import { secretKey } from '../secret';
 
 @RoutedController('/auth')
 export class AuthController extends Controller {
@@ -48,7 +49,7 @@ export class AuthController extends Controller {
 
     await DatabaseService.userStore.push().item(user).run()
 
-    const jwtToken = sign({ username: user.username }, 'my-secret-key', { expiresIn: '1d' })
+    const jwtToken = sign({ username: user.username }, secretKey, { expiresIn: '1d' })
     return { token: jwtToken }
   }
 
@@ -63,7 +64,7 @@ export class AuthController extends Controller {
       throw new BadRequestException({ message: 'Invalid username or password' })
     }
 
-    const jwtToken = sign({ username: data.username }, 'my-secret-key', { expiresIn: '1d' })
+    const jwtToken = sign({ username: data.username }, secretKey, { expiresIn: '1d' })
     return { token: jwtToken }
   }
 }
