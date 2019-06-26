@@ -13,6 +13,10 @@ export class VehicleInformation {
   @Validator.IsNotEmpty()
   @Validator.IsEnum(VehicleType)
   vehicleType: VehicleType;
+
+  @Validator.ValidateIf((_, v) => v != null)
+  @Validator.IsNumber()
+  price: number;
 }
 
 export class CargoInformation {
@@ -27,4 +31,8 @@ export class CargoInformation {
   @Validator.IsNotEmpty()
   @Validator.IsEnum(VehicleType)
   vehicleType: VehicleType;
+
+  @Validator.ValidateIf((_, v) => v != null)
+  @Validator.IsNumber()
+  price: number;
 }
