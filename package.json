@@ -35,7 +35,7 @@
     "class-validator": "^0.9.1",
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
-    "lapisdb": "^0.1.8",
+    "lapisdb": "^0.2.3",
     "reflect-metadata": "^0.1.13"
   }
 }

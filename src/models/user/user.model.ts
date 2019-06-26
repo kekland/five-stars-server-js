@@ -22,10 +22,12 @@ export class User extends Model<User> {
   savedCargoData: string[];
   savedVehicleData: string[];
 
+  verified: boolean;
+
   constructor(data: {
     username: string, hashedPassword: string, email: string, phoneNumber: string, name: Name,
     cargo: string[], vehicles: string[], organization: string, favoriteCargo: string[], favoriteVehicles: string[],
-    savedCargoData: string[], savedVehicleData: string[],
+    savedCargoData: string[], savedVehicleData: string[], verified: boolean,
   }) {
     super()
     if (data == null) return;
@@ -41,6 +43,7 @@ export class User extends Model<User> {
     this.favoriteVehicles = data.favoriteVehicles
     this.savedCargoData = data.savedCargoData
     this.savedVehicleData = data.savedVehicleData
+    this.verified = data.verified
   }
 
   static fromAuthRegisterRequestObject(data: AuthRegisterRequestObject) {
@@ -57,6 +60,7 @@ export class User extends Model<User> {
       favoriteVehicles: [],
       savedCargoData: [],
       savedVehicleData: [],
+      verified: false,
     });
   }
 }
