@@ -1,5 +1,5 @@
 import { RoutedController, Controller } from '../lapis_server/controller';
-import { Post } from '../lapis_server/request.methods';
+import { Post, Get } from '../lapis_server/request.methods';
 import { ValidationService } from '../lapis_server/utils';
 import { AuthRegisterRequestObject } from '../data/request/auth/auth.register.request.object';
 import { DatabaseService } from '../database/database.service';
@@ -41,5 +41,11 @@ export class AdminController extends Controller {
       .transformAndValidate<SetVerifiedRequestObject>(req.body, () => SetVerifiedRequestObject)
     const vehicle = await DatabaseService.vehicleStore.editItem(req.params.id, { verified: data.status })
     return vehicle
+  }
+
+  @Get('/users')
+  async getAllUsers(req: Request) {
+    const users = await DatabaseService.userStore.get().run()
+    return users
   }
 }

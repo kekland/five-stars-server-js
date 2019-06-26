@@ -10,11 +10,13 @@ import { AuthController } from './controllers/auth.controller';
 import { UserController } from './controllers/user.controller';
 import { VehicleController } from './controllers/vehicle.controller';
 import { secretKey } from './secret';
+import * as cors from 'cors'
 
 const init = async () => {
   // Initialize the database
   DatabaseService.init()
   const app = express()
+  app.use(cors())
 
   // Attach modules
   app.use(bodyParser({ extended: true }))
