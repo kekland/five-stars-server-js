@@ -11,6 +11,7 @@ import { UserController } from './controllers/user.controller';
 import { VehicleController } from './controllers/vehicle.controller';
 import { secretKey } from './secret';
 import * as cors from 'cors'
+import { AdminController } from './controllers/admin.controller';
 
 const init = async () => {
   // Initialize the database
@@ -46,6 +47,7 @@ const init = async () => {
   app.use((req, res, next) => { setTimeout(next, 0) });
 
   const controllers: Controller[] = [
+    new AdminController(),
     new CargoController(),
     new VehicleController(),
     new AuthController(),
