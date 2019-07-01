@@ -12,6 +12,7 @@ import { Request } from 'express'
 import { AuthLoginRequestObject } from '../data/request/auth/auth.login.request.object';
 import { secretKey } from '../secret';
 import { SetVerifiedRequestObject } from '../data/request/admin/setVerified.request.object';
+import { UserProfileResponseObject } from '../data/response/user.profile.response.object';
 
 @RoutedController('/admin')
 export class AdminController extends Controller {
@@ -23,7 +24,11 @@ export class AdminController extends Controller {
   async setUserVerifiedStatus(req: Request) {
     const data = await ValidationService
       .transformAndValidate<SetVerifiedRequestObject>(req.body, () => SetVerifiedRequestObject)
-    const user = await DatabaseService.userStore.editItem(req.params.id, { verified: data.status })
+
+    const user = await DatabaseService.userStore.get(req.params.id)
+    user.verified = data.status
+    await user.save()
+
     return user
   }
 
@@ -31,7 +36,11 @@ export class AdminController extends Controller {
   async setCargoVerifiedStatus(req: Request) {
     const data = await ValidationService
       .transformAndValidate<SetVerifiedRequestObject>(req.body, () => SetVerifiedRequestObject)
-    const cargo = await DatabaseService.cargoStore.editItem(req.params.id, { verified: data.status })
+
+    const cargo = await DatabaseService.cargoStore.get(req.params.id)
+    cargo.verified = data.status
+    await cargo.save()
+
     return cargo
   }
 
@@ -39,13 +48,17 @@ export class AdminController extends Controller {
   async setVehicleVerifiedStatus(req: Request) {
     const data = await ValidationService
       .transformAndValidate<SetVerifiedRequestObject>(req.body, () => SetVerifiedRequestObject)
-    const vehicle = await DatabaseService.vehicleStore.editItem(req.params.id, { verified: data.status })
+
+    const vehicle = await DatabaseService.vehicleStore.get(req.params.id)
+    vehicle.verified = data.status
+    await vehicle.save()
+
     return vehicle
   }
 
   @Get('/users')
   async getAllUsers(req: Request) {
-    const users = await DatabaseService.userStore.get().run()
-    return users
+    const users = await DatabaseService.userStore.getItems()
+    return users.map((user) => new UserProfileResponseObject(user))
   }
 }

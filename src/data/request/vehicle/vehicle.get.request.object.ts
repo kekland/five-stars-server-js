@@ -4,7 +4,6 @@ import { FilterObject } from '../filterable.object';
 import { Vehicle } from '../../../models/vehicle/vehicle.model';
 import { VehicleType } from '../../../models/shared/vehicle_type';
 import moment = require('moment');
-import { IFilter } from 'lapisdb/dist/database/filter/filter.types';
 
 export class VehicleGetRequestObject implements FilterObject<Vehicle> {
   departure: string;
@@ -46,7 +45,7 @@ export class VehicleGetRequestObject implements FilterObject<Vehicle> {
     return (lowerBound <= timestamp) && (timestamp <= upperBound);
   }
 
-  filter(data: IFilter<Vehicle>, params: { now: number }): boolean {
+  filter(data: Partial<Vehicle>, params: { now: number }): boolean {
     try {
       let value: boolean = true
       if (this.removeOld) {

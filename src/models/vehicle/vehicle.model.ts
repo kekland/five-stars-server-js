@@ -1,9 +1,11 @@
-import { Model } from 'lapisdb'
+import { Model, Reference } from 'lapisdb'
 import { NamedPosition } from '../shared/named.position';
 import { Properties, Dimensions } from '../shared/properties.model';
 import { VehicleInformation } from '../shared/information.model';
 import { Route } from '../shared/route.model';
 import { VehicleAssignRequestObject } from '../../data/request/vehicle/vehicle.assign.request.object';
+import { User } from '../user/user.model';
+import { Type } from 'class-transformer';
 
 export interface IVehicleData {
   departure: NamedPosition;
@@ -16,7 +18,7 @@ export interface IVehicleData {
   images: string[];
   archived: boolean;
   verified: boolean;
-  owner: string;
+  owner: Reference<User>;
 }
 
 export class Vehicle extends Model<Vehicle> {
@@ -35,10 +37,11 @@ export class Vehicle extends Model<Vehicle> {
   archived: boolean;
   verified: boolean;
 
-  owner: string;
+  @Type(() => Reference)
+  owner: Reference<User>;
 
   constructor(data: IVehicleData) {
-    super()
+    super(Vehicle)
     if (data == null) return;
     this.departure = data.departure
     this.departureTime = data.departureTime
@@ -65,7 +68,7 @@ export class Vehicle extends Model<Vehicle> {
       properties: data.body.properties,
       archived: false,
       verified: false,
-      owner: data.user,
+      owner: new Reference(data.user),
     })
   }
 }

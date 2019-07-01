@@ -47,7 +47,7 @@ export class AuthController extends Controller {
       throw new BadRequestException(availability)
     }
 
-    await DatabaseService.userStore.push().item(user).run()
+    await user.save()
 
     const jwtToken = sign({ username: user.username }, secretKey, { expiresIn: '1d' })
     return { token: jwtToken }

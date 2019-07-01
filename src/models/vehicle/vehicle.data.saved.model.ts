@@ -28,7 +28,7 @@ export class VehicleDataSaved extends Model<VehicleDataSaved> {
   images: string[];
 
   constructor(data: IVehicleDataSaved) {
-    super()
+    super(VehicleDataSaved)
     if (data == null) return;
     this.departure = data.departure
     this.departureTime = data.departureTime

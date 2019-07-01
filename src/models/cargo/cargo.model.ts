@@ -1,4 +1,4 @@
-import { Model } from 'lapisdb'
+import { Model, Reference } from 'lapisdb'
 import { NamedPositionWithTime } from '../shared/named.position.with.time';
 import { VehicleType } from '../shared/vehicle_type';
 import { CargoAssignRequestObject } from '../../data/request/cargo/cargo.assign.request.object';
@@ -7,6 +7,7 @@ import { Dimensions, Properties } from '../shared/properties.model';
 import { NamedPosition } from '../shared/named.position';
 import { Route } from '../shared/route.model';
 import { Type } from 'class-transformer';
+import { User } from '../user/user.model';
 
 export interface ICargoData {
   departure: NamedPosition;
@@ -19,7 +20,7 @@ export interface ICargoData {
   images: string[];
   archived: boolean;
   verified: boolean;
-  owner: string;
+  owner: Reference<User>;
 }
 
 export class Cargo extends Model<Cargo> {
@@ -49,10 +50,11 @@ export class Cargo extends Model<Cargo> {
   archived: boolean;
   verified: boolean;
 
-  owner: string;
+  @Type(() => Reference)
+  owner: Reference<User>;
 
   constructor(data: ICargoData) {
-    super()
+    super(Cargo)
     if (data == null) return;
     this.departure = data.departure
     this.departureTime = data.departureTime
@@ -79,7 +81,7 @@ export class Cargo extends Model<Cargo> {
       properties: data.body.properties,
       archived: false,
       verified: false,
-      owner: data.user,
+      owner: new Reference(data.user),
     })
   }
 }

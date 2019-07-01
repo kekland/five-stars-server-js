@@ -7,8 +7,9 @@ import { BadRequestException, UnauthorizedException } from '../lapis_server/erro
 import { Post, Put, Delete } from '../lapis_server/request.methods';
 import { GoogleMaps } from '../maps/google.maps';
 import { NamedPosition } from '../models/shared/named.position';
-import * as moment from 'moment';
 import { CargoGetRequestObject } from '../data/request/cargo/cargo.get.request.object';
+import { GetOperation, Reference } from 'lapisdb';
+import { CargoDataSaved } from '../models/cargo/cargo.data.saved.model';
 
 @RoutedController('/cargo')
 export class CargoController extends Controller {
@@ -16,9 +17,9 @@ export class CargoController extends Controller {
   async getAll(req) {
     const filterData = await ValidationService
       .transformAndValidate<CargoGetRequestObject>(req.body, () => CargoGetRequestObject, false)
-    const now = moment().unix()
+    const now = Date.now()
 
-    const data = await DatabaseService.cargoStore.get().where(item => filterData.filter(item, { now })).run()
+    const data = await DatabaseService.cargoStore.getItems({ filter: item => filterData.filter(item, { now }) })
     return data
   }
 
@@ -31,11 +32,30 @@ export class CargoController extends Controller {
       .transformAndValidate<CargoAssignRequestObject>(req.body, () => CargoAssignRequestObject)
 
     const route = await GoogleMaps.getDirections(data.departure, data.arrival)
+    const cargo = await Cargo.fromAssignRequestObject({ body: data, route, user: req.payload.username }).save()
 
-    const cargo = await DatabaseService.cargoStore.push().item(Cargo.fromAssignRequestObject({ body: data, route, user: req.payload.username })).run()
+    const user = (await (DatabaseService.userStore.getItems({ filter: (u) => u.username === req.payload.username })))[0]
+    user.cargo.push(cargo.getReference())
+    await user.save()
 
-    const user = await DatabaseService.userStore.get().where((item) => item.username === req.payload.username).first()
-    await DatabaseService.userStore.edit().item(user).with({ cargo: [...user.cargo, cargo.meta.id] }).run()
+    return cargo
+  }
+
+  @Post('/saved')
+  async createSaved(req) {
+    if (req.payload == null) {
+      throw new UnauthorizedException({ message: 'Not allowed to add cargo.' })
+    }
+    const data = await ValidationService
+      .transformAndValidate<CargoAssignRequestObject>(req.body, () => CargoAssignRequestObject)
+
+    const route = await GoogleMaps.getDirections(data.departure, data.arrival)
+
+    const cargo = await CargoDataSaved.fromAssignRequestObject({ body: data, route, user: req.payload.username }).save()
+
+    const user = (await (DatabaseService.userStore.getItems({ filter: (u) => u.username === req.payload.username })))[0]
+    user.savedCargoData.push(cargo.getReference())
+    await user.save()
 
     return cargo
   }
@@ -46,10 +66,13 @@ export class CargoController extends Controller {
       throw new UnauthorizedException({ message: 'Not allowed to edit this cargo.' })
     }
     const cargoId = req.params.id
-    const user = await DatabaseService.userStore.get().where(u => u.username === req.payload.username).first()
+    const user = (await (DatabaseService.userStore.getItems({ filter: (u) => u.username === req.payload.username })))[0]
 
     if (user.favoriteCargo.includes(cargoId)) return cargoId;
-    await DatabaseService.userStore.edit().item(user).with({ favoriteCargo: [...user.favoriteCargo, cargoId] }).run();
+
+    user.favoriteCargo.push(new Reference(cargoId))
+    await user.save()
+
     return cargoId
   }
 
@@ -59,10 +82,15 @@ export class CargoController extends Controller {
       throw new UnauthorizedException({ message: 'Not allowed to edit this cargo.' })
     }
     const cargoId = req.params.id
-    const user = await DatabaseService.userStore.get().where(u => u.username === req.payload.username).first()
+
+    const user = (await (DatabaseService.userStore.getItems({ filter: (u) => u.username === req.payload.username })))[0]
+
     if (!user.favoriteCargo.includes(cargoId)) return cargoId;
+
     const index = user.favoriteCargo.indexOf(cargoId)
-    await DatabaseService.userStore.edit().item(user).with({ favoriteCargo: user.favoriteCargo.splice(index, 1) }).run();
+    user.favoriteCargo.splice(index, 1)
+    await user.save()
+
     return cargoId
   }
 
@@ -75,30 +103,26 @@ export class CargoController extends Controller {
     const data = await ValidationService
       .transformAndValidate<CargoAssignRequestObject>(req.body, () => CargoAssignRequestObject)
 
-    let cargo = await DatabaseService.cargoStore.get()
-      .where((item) => item.meta.id === req.params.id && item.owner === req.payload.username).first()
-
-    if (cargo == null) {
+    const cargo = await DatabaseService.cargoStore.get(req.params.id)
+    if (cargo == null || cargo.owner.id !== req.payload.username) {
       throw new BadRequestException({ message: 'Cargo with this ID is not found.' })
     }
 
-    let route = cargo.route
     if (NamedPosition.arePositionsDifferent(cargo.departure, data.departure) ||
       NamedPosition.arePositionsDifferent(cargo.arrival, data.arrival)) {
-      route = await GoogleMaps.getDirections(data.departure, data.arrival)
+      cargo.route = await GoogleMaps.getDirections(data.departure, data.arrival)
     }
 
-    cargo = await (DatabaseService.cargoStore.edit().id(req.params.id).with({
-      arrival: data.arrival,
-      departure: data.departure,
-      departureTime: data.departureTime,
-      dimensions: data.dimensions,
-      images: data.images,
-      information: data.information,
-      properties: data.properties,
-      route,
-      verified: false,
-    }).edit())
+    cargo.arrival = data.arrival || cargo.arrival
+    cargo.departure = data.departure || cargo.departure
+    cargo.departureTime = data.departureTime || cargo.departureTime
+    cargo.dimensions = data.dimensions || cargo.dimensions
+    cargo.images = data.images || cargo.images
+    cargo.information = data.information || cargo.information
+    cargo.properties = data.properties || cargo.properties
+    cargo.verified = false
+
+    await cargo.save()
 
     return cargo;
   }
@@ -109,14 +133,12 @@ export class CargoController extends Controller {
       throw new UnauthorizedException({ message: 'Not allowed to delete this cargo.' })
     }
 
-    const cargo = await DatabaseService.cargoStore.get()
-      .where((item) => item.meta.id === req.params.id && item.owner === req.payload.username).first()
-
-    if (cargo == null) {
-      throw new BadRequestException({ message: 'Cargo with this ID was not found.' })
+    const cargo = await DatabaseService.cargoStore.get(req.params.id)
+    if (cargo == null || cargo.owner.id !== req.payload.username) {
+      throw new BadRequestException({ message: 'Cargo with this ID is not found.' })
     }
 
-    await DatabaseService.cargoStore.delete().id(req.params.id).run()
+    await cargo.delete()
 
     return { deleted: true }
   }

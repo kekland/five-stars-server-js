@@ -1,14 +1,15 @@
-import { Controller, RoutedController } from '../lapis_server/controller';
-import { DatabaseService } from '../database/database.service';
-import { ValidationService } from '../lapis_server/utils';
-import { BadRequestException, UnauthorizedException } from '../lapis_server/errors';
+import { RoutedController, Controller } from '../lapis_server/controller';
 import { Post, Put, Delete } from '../lapis_server/request.methods';
-import { GoogleMaps } from '../maps/google.maps';
-import { NamedPosition } from '../models/shared/named.position';
-import * as moment from 'moment';
-import { Vehicle } from '../models/vehicle/vehicle.model';
-import { VehicleAssignRequestObject } from '../data/request/vehicle/vehicle.assign.request.object';
+import { ValidationService } from '../lapis_server/utils';
 import { VehicleGetRequestObject } from '../data/request/vehicle/vehicle.get.request.object';
+import { DatabaseService } from '../database/database.service';
+import { UnauthorizedException, BadRequestException } from '../lapis_server/errors';
+import { VehicleAssignRequestObject } from '../data/request/vehicle/vehicle.assign.request.object';
+import { GoogleMaps } from '../maps/google.maps';
+import { Vehicle } from '../models/vehicle/vehicle.model';
+import { VehicleDataSaved } from '../models/vehicle/vehicle.data.saved.model';
+import { Reference } from 'lapisdb';
+import { NamedPosition } from '../models/shared/named.position';
 
 @RoutedController('/vehicle')
 export class VehicleController extends Controller {
@@ -16,9 +17,9 @@ export class VehicleController extends Controller {
   async getAll(req) {
     const filterData = await ValidationService
       .transformAndValidate<VehicleGetRequestObject>(req.body, () => VehicleGetRequestObject, false)
-    const now = moment().unix()
-    const data = await DatabaseService.vehicleStore.get().where(item => filterData.filter(item, { now })).run()
+    const now = Date.now()
 
+    const data = await DatabaseService.vehicleStore.getItems({ filter: item => filterData.filter(item, { now }) })
     return data
   }
 
@@ -31,12 +32,30 @@ export class VehicleController extends Controller {
       .transformAndValidate<VehicleAssignRequestObject>(req.body, () => VehicleAssignRequestObject)
 
     const route = await GoogleMaps.getDirections(data.departure, data.arrival)
+    const vehicle = await Vehicle.fromAssignRequestObject({ body: data, route, user: req.payload.username }).save()
 
-    const vehicle = await DatabaseService.vehicleStore.push()
-      .item(Vehicle.fromAssignRequestObject({ body: data, route, user: req.payload.username })).run()
+    const user = (await (DatabaseService.userStore.getItems({ filter: (u) => u.username === req.payload.username })))[0]
+    user.vehicles.push(vehicle.getReference())
+    await user.save()
 
-    const user = await DatabaseService.userStore.get().where((item) => item.username === req.payload.username).first()
-    await DatabaseService.userStore.edit().item(user).with({ vehicles: [...user.vehicles, vehicle.meta.id] }).run()
+    return vehicle
+  }
+
+  @Post('/saved')
+  async createSaved(req) {
+    if (req.payload == null) {
+      throw new UnauthorizedException({ message: 'Not allowed to add vehicle.' })
+    }
+    const data = await ValidationService
+      .transformAndValidate<VehicleAssignRequestObject>(req.body, () => VehicleAssignRequestObject)
+
+    const route = await GoogleMaps.getDirections(data.departure, data.arrival)
+
+    const vehicle = await VehicleDataSaved.fromAssignRequestObject({ body: data, route, user: req.payload.username }).save()
+
+    const user = (await (DatabaseService.userStore.getItems({ filter: (u) => u.username === req.payload.username })))[0]
+    user.savedVehicleData.push(vehicle.getReference())
+    await user.save()
 
     return vehicle
   }
@@ -47,10 +66,13 @@ export class VehicleController extends Controller {
       throw new UnauthorizedException({ message: 'Not allowed to edit this vehicle.' })
     }
     const vehicleId = req.params.id
-    const user = await DatabaseService.userStore.get().where(u => u.username === req.payload.username).first()
+    const user = (await (DatabaseService.userStore.getItems({ filter: (u) => u.username === req.payload.username })))[0]
 
     if (user.favoriteVehicles.includes(vehicleId)) return vehicleId;
-    await DatabaseService.userStore.edit().item(user).with({ favoriteVehicles: [...user.favoriteVehicles, vehicleId] }).run();
+
+    user.favoriteVehicles.push(new Reference(vehicleId))
+    await user.save()
+
     return vehicleId
   }
 
@@ -60,11 +82,15 @@ export class VehicleController extends Controller {
       throw new UnauthorizedException({ message: 'Not allowed to edit this vehicle.' })
     }
     const vehicleId = req.params.id
-    const user = await DatabaseService.userStore.get().where(u => u.username === req.payload.username).first()
+
+    const user = (await (DatabaseService.userStore.getItems({ filter: (u) => u.username === req.payload.username })))[0]
 
     if (!user.favoriteVehicles.includes(vehicleId)) return vehicleId;
+
     const index = user.favoriteVehicles.indexOf(vehicleId)
-    await DatabaseService.userStore.edit().item(user).with({ favoriteVehicles: user.favoriteVehicles.splice(index, 1) }).run();
+    user.favoriteVehicles.splice(index, 1)
+    await user.save()
+
     return vehicleId
   }
 
@@ -77,29 +103,26 @@ export class VehicleController extends Controller {
     const data = await ValidationService
       .transformAndValidate<VehicleAssignRequestObject>(req.body, () => VehicleAssignRequestObject)
 
-    let vehicle = await DatabaseService.vehicleStore.get()
-      .where((item) => item.meta.id === req.params.id && item.owner === req.payload.username).first()
-
-    if (vehicle == null) {
+    const vehicle = await DatabaseService.vehicleStore.get(req.params.id)
+    if (vehicle == null || vehicle.owner.id !== req.payload.username) {
       throw new BadRequestException({ message: 'Vehicle with this ID is not found.' })
     }
 
-    let route = vehicle.route
     if (NamedPosition.arePositionsDifferent(vehicle.departure, data.departure) ||
       NamedPosition.arePositionsDifferent(vehicle.arrival, data.arrival)) {
-      route = await GoogleMaps.getDirections(data.departure, data.arrival)
+      vehicle.route = await GoogleMaps.getDirections(data.departure, data.arrival)
     }
-    vehicle = await DatabaseService.vehicleStore.edit().id(req.params.id).with({
-      arrival: data.arrival,
-      departure: data.departure,
-      departureTime: data.departureTime,
-      dimensions: data.dimensions,
-      images: data.images,
-      information: data.information,
-      properties: data.properties,
-      route,
-      verified: false,
-    }).run()
+
+    vehicle.arrival = data.arrival || vehicle.arrival
+    vehicle.departure = data.departure || vehicle.departure
+    vehicle.departureTime = data.departureTime || vehicle.departureTime
+    vehicle.dimensions = data.dimensions || vehicle.dimensions
+    vehicle.images = data.images || vehicle.images
+    vehicle.information = data.information || vehicle.information
+    vehicle.properties = data.properties || vehicle.properties
+    vehicle.verified = false
+
+    await vehicle.save()
 
     return vehicle;
   }
@@ -110,14 +133,12 @@ export class VehicleController extends Controller {
       throw new UnauthorizedException({ message: 'Not allowed to delete this vehicle.' })
     }
 
-    const vehicle = await DatabaseService.vehicleStore.get()
-      .where((item) => item.meta.id === req.params.id && item.owner === req.payload.username).first()
-
-    if (vehicle == null) {
-      throw new BadRequestException({ message: 'Vehicle with this ID was not found.' })
+    const vehicle = await DatabaseService.vehicleStore.get(req.params.id)
+    if (vehicle == null || vehicle.owner.id !== req.payload.username) {
+      throw new BadRequestException({ message: 'Vehicle with this ID is not found.' })
     }
 
-    await DatabaseService.vehicleStore.delete().id(req.params.id).run()
+    await vehicle.delete()
 
     return { deleted: true }
   }

@@ -4,7 +4,6 @@ import { Cargo } from '../../../models/cargo/cargo.model';
 import { VehicleType } from '../../../models/shared/vehicle_type';
 import * as Validator from 'class-validator'
 import { Type } from 'class-transformer';
-import { IFilter } from 'lapisdb/dist/database/filter/filter.types';
 import moment = require('moment');
 
 export class CargoGetRequestObject implements FilterObject<Cargo> {
@@ -48,7 +47,7 @@ export class CargoGetRequestObject implements FilterObject<Cargo> {
     return (lowerBound <= timestamp) && (timestamp <= upperBound);
   }
 
-  filter(data: IFilter<Cargo>, params: { now: number }): boolean {
+  filter(data: Partial<Cargo>, params: { now: number }): boolean {
     try {
       let value: boolean = true
       if (this.removeOld) {

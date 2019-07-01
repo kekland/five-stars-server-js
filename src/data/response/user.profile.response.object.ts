@@ -1,9 +1,9 @@
 import { Name } from '../../models/shared/name';
-import { IObjectMetadata } from 'lapisdb/dist/database/model/model';
+import { IModelMetadata } from 'lapisdb';
 import { User } from '../../models/user/user.model';
 
 export class UserProfileResponseObject {
-  meta: IObjectMetadata;
+  meta: IModelMetadata;
   username: string;
   email: string;
   phoneNumber: string;
@@ -19,6 +19,8 @@ export class UserProfileResponseObject {
   savedCargoData: string[];
   savedVehicleData: string[];
 
+  verified: boolean;
+
   constructor(data: User) {
     this.meta = data.meta
     this.username = data.username
@@ -26,11 +28,12 @@ export class UserProfileResponseObject {
     this.phoneNumber = data.phoneNumber
     this.organization = data.organization
     this.name = data.name
-    this.cargo = data.cargo
-    this.vehicles = data.vehicles
-    this.favoriteCargo = data.favoriteCargo
-    this.favoriteVehicles = data.favoriteVehicles
-    this.savedCargoData = data.savedCargoData
-    this.savedVehicleData = data.savedVehicleData
+    this.cargo = data.cargo.map(v => v.id)
+    this.vehicles = data.vehicles.map(v => v.id)
+    this.favoriteCargo = data.favoriteCargo.map(v => v.id)
+    this.favoriteVehicles = data.favoriteVehicles.map(v => v.id)
+    this.savedCargoData = data.savedCargoData.map(v => v.id)
+    this.savedVehicleData = data.savedVehicleData.map(v => v.id)
+    this.verified = data.verified || false
   }
 }

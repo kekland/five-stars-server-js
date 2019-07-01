@@ -40,7 +40,7 @@ export class CargoDataSaved extends Model<CargoDataSaved> {
   images: string[];
 
   constructor(data: ICargoDataSaved) {
-    super()
+    super(CargoDataSaved)
     if (data == null) return;
     this.departure = data.departure
     this.departureTime = data.departureTime

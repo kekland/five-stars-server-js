@@ -5,6 +5,10 @@ import { BadRequestException } from '../lapis_server/errors';
 import { ValidationService } from '../lapis_server/utils';
 import { ProfileEditRequestObject } from '../data/request/profile.edit.request.object';
 import { UserProfileResponseObject } from '../data/response/user.profile.response.object';
+import { Cargo } from '../models/cargo/cargo.model';
+import { Vehicle } from '../models/vehicle/vehicle.model';
+import { CargoDataSaved } from '../models/cargo/cargo.data.saved.model';
+import { VehicleDataSaved } from '../models/vehicle/vehicle.data.saved.model';
 
 @RoutedController('/user')
 export class UserController extends Controller {
@@ -16,7 +20,7 @@ export class UserController extends Controller {
   async getProfile(req) {
     const username = req.params.username
 
-    const user = await DatabaseService.userStore.get().where((item) => item.username === username).first()
+    const user = (await DatabaseService.userStore.getItems({ filter: (item) => item.username === username }))[0]
 
     if (user == null) {
       throw new BadRequestException({ message: 'User with this username was not found.' })
@@ -33,16 +37,19 @@ export class UserController extends Controller {
     const data = await ValidationService
       .transformAndValidate<ProfileEditRequestObject>(req.body, () => ProfileEditRequestObject)
 
-    let user = await DatabaseService.userStore.get().where((item) => item.username === username).first()
+    const user = (await DatabaseService.userStore.getItems({ filter: (item) => item.username === username }))[0]
 
     if (user == null) {
       throw new BadRequestException({ message: 'User with this username was not found.' })
     }
     else {
-      await DatabaseService.userStore.edit().item(user)
-        .with({ organization: data.organization, email: data.email, name: data.name, phoneNumber: data.phoneNumber }).run();
+      user.organization = data.organization || user.organization
+      user.email = data.email || user.email
+      user.name = data.name || user.name
+      user.phoneNumber = data.phoneNumber || user.phoneNumber
 
-      user = await DatabaseService.userStore.get().where((item) => item.username === username).first()
+      await user.save()
+
       return user;
     }
   }
@@ -51,12 +58,12 @@ export class UserController extends Controller {
   async getFavoriteCargo(req) {
     const username = req.params.username
 
-    const user = await DatabaseService.userStore.get().where((item) => item.username === username).first()
+    const user = (await DatabaseService.userStore.getItems({ filter: (item) => item.username === username }))[0]
 
     if (user == null) {
       throw new BadRequestException({ message: 'User with this username was not found.' })
     }
-    const cargos = await DatabaseService.cargoStore.get().where(c => user.favoriteCargo.includes(c.meta.id)).run()
+    const cargos = await Promise.all(user.favoriteCargo.map((c) => c.get(Cargo)))
     return cargos
   }
 
@@ -64,12 +71,25 @@ export class UserController extends Controller {
   async getCargos(req) {
     const username = req.params.username
 
-    const user = await DatabaseService.userStore.get().where((item) => item.username === username).first()
+    const user = (await DatabaseService.userStore.getItems({ filter: (item) => item.username === username }))[0]
 
     if (user == null) {
       throw new BadRequestException({ message: 'User with this username was not found.' })
     }
-    const cargos = await DatabaseService.cargoStore.get().where(c => user.cargo.includes(c.meta.id)).run()
+    const cargos = await Promise.all(user.cargo.map((c) => c.get(Cargo)))
+    return cargos
+  }
+
+  @Get('/:username/cargo/saved')
+  async getSavedCargos(req) {
+    const username = req.params.username
+
+    const user = (await DatabaseService.userStore.getItems({ filter: (item) => item.username === username }))[0]
+
+    if (user == null) {
+      throw new BadRequestException({ message: 'User with this username was not found.' })
+    }
+    const cargos = await Promise.all(user.savedCargoData.map((c) => c.get(CargoDataSaved)))
     return cargos
   }
 
@@ -77,25 +97,38 @@ export class UserController extends Controller {
   async getFavoriteVehicle(req) {
     const username = req.params.username
 
-    const user = await DatabaseService.userStore.get().where((item) => item.username === username).first()
+    const user = (await DatabaseService.userStore.getItems({ filter: (item) => item.username === username }))[0]
 
     if (user == null) {
       throw new BadRequestException({ message: 'User with this username was not found.' })
     }
-    const vehicles = await DatabaseService.vehicleStore.get().where(v => user.favoriteVehicles.includes(v.meta.id)).run()
-    return vehicles
+    const cargos = await Promise.all(user.favoriteVehicles.map((c) => c.get(Vehicle)))
+    return cargos
   }
 
   @Get('/:username/vehicle')
   async getVehicles(req) {
     const username = req.params.username
 
-    const user = await DatabaseService.userStore.get().where((item) => item.username === username).first()
+    const user = (await DatabaseService.userStore.getItems({ filter: (item) => item.username === username }))[0]
 
     if (user == null) {
       throw new BadRequestException({ message: 'User with this username was not found.' })
     }
-    const vehicles = await DatabaseService.vehicleStore.get().where(v => user.vehicles.includes(v.meta.id)).run()
-    return vehicles
+    const cargos = await Promise.all(user.vehicles.map((c) => c.get(Vehicle)))
+    return cargos
+  }
+
+  @Get('/:username/vehicle/saved')
+  async getSavedVehicles(req) {
+    const username = req.params.username
+
+    const user = (await DatabaseService.userStore.getItems({ filter: (item) => item.username === username }))[0]
+
+    if (user == null) {
+      throw new BadRequestException({ message: 'User with this username was not found.' })
+    }
+    const cargos = await Promise.all(user.savedVehicleData.map((c) => c.get(VehicleDataSaved)))
+    return cargos
   }
 }

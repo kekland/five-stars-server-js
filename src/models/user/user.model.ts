@@ -1,7 +1,12 @@
-import { Model } from 'lapisdb';
+import { Model, Reference } from 'lapisdb';
 import { Name } from '../shared/name';
 import { hashSync, genSaltSync, genSalt } from 'bcrypt'
 import { AuthRegisterRequestObject } from '../../data/request/auth/auth.register.request.object';
+import { CargoDataSaved } from '../cargo/cargo.data.saved.model';
+import { VehicleDataSaved } from '../vehicle/vehicle.data.saved.model';
+import { Vehicle } from '../vehicle/vehicle.model';
+import { Cargo } from '../cargo/cargo.model';
+import { Type } from 'class-transformer';
 
 export class User extends Model<User> {
   username: string;
@@ -13,23 +18,35 @@ export class User extends Model<User> {
   name: Name;
   organization: string;
 
-  cargo: string[];
-  vehicles: string[];
+  @Type(() => Reference)
+  cargo: Array<Reference<Cargo>>
+  @Type(() => Reference)
+  vehicles: Array<Reference<Vehicle>>
 
-  favoriteCargo: string[];
-  favoriteVehicles: string[];
+  @Type(() => Reference)
+  favoriteCargo: Array<Reference<Cargo>>
+  @Type(() => Reference)
+  favoriteVehicles: Array<Reference<Vehicle>>
 
-  savedCargoData: string[];
-  savedVehicleData: string[];
+  @Type(() => Reference)
+  savedCargoData: Array<Reference<CargoDataSaved>>
+  @Type(() => Reference)
+  savedVehicleData: Array<Reference<VehicleDataSaved>>
 
   verified: boolean;
 
   constructor(data: {
     username: string, hashedPassword: string, email: string, phoneNumber: string, name: Name,
-    cargo: string[], vehicles: string[], organization: string, favoriteCargo: string[], favoriteVehicles: string[],
-    savedCargoData: string[], savedVehicleData: string[], verified: boolean,
+    organization: string,
+    cargo: Array<Reference<Cargo>>,
+    vehicles: Array<Reference<Vehicle>>,
+    favoriteCargo: Array<Reference<Cargo>>,
+    favoriteVehicles: Array<Reference<Vehicle>>,
+    savedCargoData: Array<Reference<CargoDataSaved>>,
+    savedVehicleData: Array<Reference<VehicleDataSaved>>,
+    verified: boolean,
   }) {
-    super()
+    super(User)
     if (data == null) return;
     this.username = data.username
     this.hashedPassword = data.hashedPassword
