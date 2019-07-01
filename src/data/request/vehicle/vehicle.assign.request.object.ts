@@ -36,6 +36,5 @@ export class VehicleAssignRequestObject {
   information: VehicleInformation;
 
   @Validator.IsNotEmpty()
-  @Validator.IsUrl({}, { each: true })
   images: string[];
 }

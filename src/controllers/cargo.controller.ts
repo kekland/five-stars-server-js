@@ -67,10 +67,10 @@ export class CargoController extends Controller {
     }
     const cargoId = req.params.id
     const user = (await (DatabaseService.userStore.getItems({ filter: (u) => u.username === req.payload.username })))[0]
+    const reference = new Reference<Cargo>(cargoId)
+    if (user.favoriteCargo.some(ref => ref.id === cargoId)) return cargoId;
 
-    if (user.favoriteCargo.includes(cargoId)) return cargoId;
-
-    user.favoriteCargo.push(new Reference(cargoId))
+    user.favoriteCargo.push(reference)
     await user.save()
 
     return cargoId
@@ -85,9 +85,9 @@ export class CargoController extends Controller {
 
     const user = (await (DatabaseService.userStore.getItems({ filter: (u) => u.username === req.payload.username })))[0]
 
-    if (!user.favoriteCargo.includes(cargoId)) return cargoId;
+    if (!user.favoriteCargo.some(ref => ref.id === cargoId)) return cargoId;
 
-    const index = user.favoriteCargo.indexOf(cargoId)
+    const index = user.favoriteCargo.findIndex((v) => v.id === cargoId)
     user.favoriteCargo.splice(index, 1)
     await user.save()
 

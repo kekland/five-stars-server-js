@@ -38,6 +38,5 @@ export class CargoAssignRequestObject {
   information: CargoInformation;
 
   @Validator.IsNotEmpty()
-  @Validator.IsUrl({}, { each: true })
   images: string[];
 }

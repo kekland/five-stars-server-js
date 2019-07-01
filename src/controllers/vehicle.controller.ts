@@ -68,7 +68,7 @@ export class VehicleController extends Controller {
     const vehicleId = req.params.id
     const user = (await (DatabaseService.userStore.getItems({ filter: (u) => u.username === req.payload.username })))[0]
 
-    if (user.favoriteVehicles.includes(vehicleId)) return vehicleId;
+    if (user.favoriteVehicles.some(ref => ref.id === vehicleId)) return vehicleId;
 
     user.favoriteVehicles.push(new Reference(vehicleId))
     await user.save()
@@ -85,9 +85,9 @@ export class VehicleController extends Controller {
 
     const user = (await (DatabaseService.userStore.getItems({ filter: (u) => u.username === req.payload.username })))[0]
 
-    if (!user.favoriteVehicles.includes(vehicleId)) return vehicleId;
+    if (!user.favoriteVehicles.some(ref => ref.id === vehicleId)) return vehicleId;
 
-    const index = user.favoriteVehicles.indexOf(vehicleId)
+    const index = user.favoriteVehicles.findIndex((v) => v.id === vehicleId)
     user.favoriteVehicles.splice(index, 1)
     await user.save()
 
