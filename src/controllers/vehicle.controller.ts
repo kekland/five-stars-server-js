@@ -19,7 +19,7 @@ export class VehicleController extends Controller {
       .transformAndValidate<VehicleGetRequestObject>(req.body, () => VehicleGetRequestObject, false)
     const now = Date.now()
 
-    const data = await DatabaseService.vehicleStore.getItems({ filter: item => filterData.filter(item, { now }) })
+    const data = await DatabaseService.vehicleStore.getItems(item => filterData.filter(item, { now }))
     return data
   }
 
@@ -34,7 +34,7 @@ export class VehicleController extends Controller {
     const route = await GoogleMaps.getDirections(data.departure, data.arrival)
     const vehicle = await Vehicle.fromAssignRequestObject({ body: data, route, user: req.payload.username }).save()
 
-    const user = (await (DatabaseService.userStore.getItems({ filter: (u) => u.username === req.payload.username })))[0]
+    const user = await DatabaseService.userStore.get({ username: req.payload.username })
     user.vehicles.push(vehicle.getReference())
     await user.save()
 
@@ -53,7 +53,7 @@ export class VehicleController extends Controller {
 
     const vehicle = await VehicleDataSaved.fromAssignRequestObject({ body: data, route, user: req.payload.username }).save()
 
-    const user = (await (DatabaseService.userStore.getItems({ filter: (u) => u.username === req.payload.username })))[0]
+    const user = await DatabaseService.userStore.get({ username: req.payload.username })
     user.savedVehicleData.push(vehicle.getReference())
     await user.save()
 
@@ -66,7 +66,7 @@ export class VehicleController extends Controller {
       throw new UnauthorizedException({ message: 'Not allowed to edit this vehicle.' })
     }
     const vehicleId = req.params.id
-    const user = (await (DatabaseService.userStore.getItems({ filter: (u) => u.username === req.payload.username })))[0]
+    const user = await DatabaseService.userStore.get({ username: req.payload.username })
 
     if (user.favoriteVehicles.some(ref => ref.id === vehicleId)) return vehicleId;
 
@@ -83,7 +83,7 @@ export class VehicleController extends Controller {
     }
     const vehicleId = req.params.id
 
-    const user = (await (DatabaseService.userStore.getItems({ filter: (u) => u.username === req.payload.username })))[0]
+    const user = await DatabaseService.userStore.get({ username: req.payload.username })
 
     if (!user.favoriteVehicles.some(ref => ref.id === vehicleId)) return vehicleId;
 

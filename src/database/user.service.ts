@@ -11,19 +11,19 @@ export interface UserAvailability {
 
 export class UserService {
   static async isUserAvailable(data: { phoneNumber: string, email: string, username: string }): Promise<UserAvailability> {
-    const phoneNumberTaken = (await DatabaseService.userStore.getItems({filter: (value) => value.phoneNumber === data.phoneNumber})).length > 0
-    const usernameTaken = (await DatabaseService.userStore.getItems({filter: (value) => value.username === data.username})).length > 0
-    const emailTaken = (await DatabaseService.userStore.getItems({filter: (value) => value.email === data.email})).length > 0
+    const phoneNumberTaken = await DatabaseService.userStore.get({phoneNumber: data.phoneNumber})
+    const usernameTaken = await DatabaseService.userStore.get({username: data.username})
+    const emailTaken = await DatabaseService.userStore.get({email: data.email})
 
     return {
-      usernameTaken,
-      emailTaken,
-      phoneNumberTaken,
+      usernameTaken: usernameTaken != null,
+      emailTaken: emailTaken != null,
+      phoneNumberTaken: phoneNumberTaken != null,
     };
   }
 
   static async checkCredentials(data: AuthLoginRequestObject): Promise<boolean> {
-    const user = (await DatabaseService.userStore.getItems({filter: (value) => value.username === data.username}))[0]
+    const user = await DatabaseService.userStore.get({username: data.username})
 
     if (user == null) {
       return false

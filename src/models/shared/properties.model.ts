@@ -7,9 +7,13 @@ export class Properties {
   @Validator.IsPositive()
   volume: number;
 
-  constructor(data: { weight: number, volume: number }) {
+  @Validator.ValidateIf((_, v) => v != null)
+  price?: number;
+
+  constructor(data: { price?: number, weight: number, volume: number }) {
     if (data == null) return;
 
+    this.price = data.price
     this.weight = data.weight
     this.volume = data.volume
   }

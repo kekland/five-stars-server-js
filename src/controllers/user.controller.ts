@@ -20,7 +20,7 @@ export class UserController extends Controller {
   async getProfile(req) {
     const username = req.params.username
 
-    const user = (await DatabaseService.userStore.getItems({ filter: (item) => item.username === username }))[0]
+    const user = await DatabaseService.userStore.get({ username })
 
     if (user == null) {
       throw new BadRequestException({ message: 'User with this username was not found.' })
@@ -37,7 +37,7 @@ export class UserController extends Controller {
     const data = await ValidationService
       .transformAndValidate<ProfileEditRequestObject>(req.body, () => ProfileEditRequestObject)
 
-    const user = (await DatabaseService.userStore.getItems({ filter: (item) => item.username === username }))[0]
+    const user = await DatabaseService.userStore.get({ username })
 
     if (user == null) {
       throw new BadRequestException({ message: 'User with this username was not found.' })
@@ -58,7 +58,7 @@ export class UserController extends Controller {
   async getFavoriteCargo(req) {
     const username = req.params.username
 
-    const user = (await DatabaseService.userStore.getItems({ filter: (item) => item.username === username }))[0]
+    const user = await DatabaseService.userStore.get({ username })
 
     if (user == null) {
       throw new BadRequestException({ message: 'User with this username was not found.' })
@@ -71,7 +71,7 @@ export class UserController extends Controller {
   async getCargos(req) {
     const username = req.params.username
 
-    const user = (await DatabaseService.userStore.getItems({ filter: (item) => item.username === username }))[0]
+    const user = await DatabaseService.userStore.get({ username })
 
     if (user == null) {
       throw new BadRequestException({ message: 'User with this username was not found.' })
@@ -84,7 +84,7 @@ export class UserController extends Controller {
   async getSavedCargos(req) {
     const username = req.params.username
 
-    const user = (await DatabaseService.userStore.getItems({ filter: (item) => item.username === username }))[0]
+    const user = await DatabaseService.userStore.get({ username })
 
     if (user == null) {
       throw new BadRequestException({ message: 'User with this username was not found.' })
@@ -97,7 +97,7 @@ export class UserController extends Controller {
   async getFavoriteVehicle(req) {
     const username = req.params.username
 
-    const user = (await DatabaseService.userStore.getItems({ filter: (item) => item.username === username }))[0]
+    const user = await DatabaseService.userStore.get({ username })
 
     if (user == null) {
       throw new BadRequestException({ message: 'User with this username was not found.' })
@@ -110,7 +110,7 @@ export class UserController extends Controller {
   async getVehicles(req) {
     const username = req.params.username
 
-    const user = (await DatabaseService.userStore.getItems({ filter: (item) => item.username === username }))[0]
+    const user = await DatabaseService.userStore.get({ username })
 
     if (user == null) {
       throw new BadRequestException({ message: 'User with this username was not found.' })
@@ -123,7 +123,7 @@ export class UserController extends Controller {
   async getSavedVehicles(req) {
     const username = req.params.username
 
-    const user = (await DatabaseService.userStore.getItems({ filter: (item) => item.username === username }))[0]
+    const user = await DatabaseService.userStore.get({ username })
 
     if (user == null) {
       throw new BadRequestException({ message: 'User with this username was not found.' })

@@ -19,7 +19,7 @@ export class CargoController extends Controller {
       .transformAndValidate<CargoGetRequestObject>(req.body, () => CargoGetRequestObject, false)
     const now = Date.now()
 
-    const data = await DatabaseService.cargoStore.getItems({ filter: item => filterData.filter(item, { now }) })
+    const data = await DatabaseService.cargoStore.getItems(item => filterData.filter(item, { now }))
     return data
   }
 
@@ -34,7 +34,7 @@ export class CargoController extends Controller {
     const route = await GoogleMaps.getDirections(data.departure, data.arrival)
     const cargo = await Cargo.fromAssignRequestObject({ body: data, route, user: req.payload.username }).save()
 
-    const user = (await (DatabaseService.userStore.getItems({ filter: (u) => u.username === req.payload.username })))[0]
+    const user = await DatabaseService.userStore.get({ username: req.payload.username })
     user.cargo.push(cargo.getReference())
     await user.save()
 
@@ -53,7 +53,7 @@ export class CargoController extends Controller {
 
     const cargo = await CargoDataSaved.fromAssignRequestObject({ body: data, route, user: req.payload.username }).save()
 
-    const user = (await (DatabaseService.userStore.getItems({ filter: (u) => u.username === req.payload.username })))[0]
+    const user = await DatabaseService.userStore.get({ username: req.payload.username })
     user.savedCargoData.push(cargo.getReference())
     await user.save()
 
@@ -66,7 +66,7 @@ export class CargoController extends Controller {
       throw new UnauthorizedException({ message: 'Not allowed to edit this cargo.' })
     }
     const cargoId = req.params.id
-    const user = (await (DatabaseService.userStore.getItems({ filter: (u) => u.username === req.payload.username })))[0]
+    const user = await DatabaseService.userStore.get({ username: req.payload.username })
     const reference = new Reference<Cargo>(cargoId)
     if (user.favoriteCargo.some(ref => ref.id === cargoId)) return cargoId;
 
@@ -83,7 +83,7 @@ export class CargoController extends Controller {
     }
     const cargoId = req.params.id
 
-    const user = (await (DatabaseService.userStore.getItems({ filter: (u) => u.username === req.payload.username })))[0]
+    const user = await DatabaseService.userStore.get({ username: req.payload.username })
 
     if (!user.favoriteCargo.some(ref => ref.id === cargoId)) return cargoId;
 
