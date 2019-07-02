@@ -12,6 +12,7 @@ import { VehicleController } from './controllers/vehicle.controller';
 import { secretKey } from './secret';
 import * as cors from 'cors'
 import { AdminController } from './controllers/admin.controller';
+import history = require('connect-history-api-fallback')
 
 const init = async () => {
   // Initialize the database
@@ -62,6 +63,18 @@ const init = async () => {
   app.listen(port, () => {
     // tslint:disable-next-line:no-console
     console.log(`Listening on port ${port}`)
+  })
+
+  const staticServer = express()
+
+  const serverRoot = './www'
+  staticServer.use(history())
+  staticServer.use(express.static(serverRoot))
+  staticServer.use(history())
+
+  staticServer.listen(3009, () => {
+    // tslint:disable-next-line:no-console
+    console.log(`Static listen on port 3009`)
   })
 }
 
