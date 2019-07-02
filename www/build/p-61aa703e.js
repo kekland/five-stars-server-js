@@ -1,0 +1,1 @@
+const r={autoTransporter:"Автотранспортер",onboard:"Бортовой",jumbo:"Джамбо",closed:"Закрытый",isotherm:"Изотермический",isothermRefrigerated:"Изотерм. реф.",containerTransporter:"Контейнеровоз",mega:"Мега",open:"Открытый",refrigerator:"Рефрижератор",dumpTruck:"Самосвал",tent:"Тент",trawl:"Трал",allMetal:"Цельнометаллический",curtain:"Шторка",other:"Другой"};export{r as v};
