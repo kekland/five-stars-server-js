@@ -67,6 +67,7 @@ export class CargoGetRequestObject implements FilterObject<Cargo> {
       }
 
       if (this.departure != null) {
+        console.log(JSON.stringify(data.departure), JSON.stringify(this.departure))
         value = value &&
           (GoogleMaps.getDistanceBetweenTwoPoints(data.departure.latitude, data.departure.longitude,
             this.departure.latitude, this.departure.longitude) < 100.0);
