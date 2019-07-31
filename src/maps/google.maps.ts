@@ -24,4 +24,22 @@ export class GoogleMaps {
       return null;
     }
   }
+
+  static getDistanceBetweenTwoPoints(lat1: number, lon1: number, lat2: number, lon2: number): number {
+    const pi = 3.141592653
+    const dLat: number = (lat2 - lat1) *
+      pi / 180.0
+    const dLon: number = (lon2 - lon1) *
+      pi / 180.0
+
+    lat1 = (lat1) * pi / 180.0
+    lat2 = (lat2) * pi / 180.0
+
+    const a: number = Math.pow(Math.sin(dLat / 2), 2) +
+      Math.pow(Math.sin(dLon / 2), 2) *
+      Math.cos(lat1) * Math.cos(lat2);
+    const rad: number = 6371;
+    const c: number = 2 * Math.asin(Math.sqrt(a));
+    return rad * c;
+  }
 }

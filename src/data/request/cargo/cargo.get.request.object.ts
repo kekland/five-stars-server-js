@@ -5,14 +5,18 @@ import { VehicleType } from '../../../models/shared/vehicle_type';
 import * as Validator from 'class-validator'
 import { Type } from 'class-transformer';
 import moment = require('moment');
+import { GoogleMaps } from '../../../maps/google.maps';
+import { NamedPosition } from '../../../models/shared/named.position';
 
 export class CargoGetRequestObject implements FilterObject<Cargo> {
-  departure: string;
+  @Type(() => NamedPosition)
+  departure: NamedPosition;
 
   @Type(() => Bounded)
   departureTime: Bounded<Date>;
 
-  arrival: string;
+  @Type(() => NamedPosition)
+  arrival: NamedPosition;
 
   @Type(() => Bounded)
   weight: Bounded<number>;
@@ -62,9 +66,13 @@ export class CargoGetRequestObject implements FilterObject<Cargo> {
         }
       }
 
-      if (this.departure != null) value = value && data.departure.name === this.departure;
+      if (this.departure != null) value = value &&
+        GoogleMaps.getDistanceBetweenTwoPoints(data.departure.latitude, data.departure.longitude,
+          this.departure.latitude, this.departure.longitude) < 100.0;
       if (this.departureTime != null) value = value && this.isInDayRange(data.departureTime);
-      if (this.arrival != null) value = value && data.arrival.name === this.arrival;
+      if (this.arrival != null) value = value &&
+        GoogleMaps.getDistanceBetweenTwoPoints(data.arrival.latitude, data.arrival.longitude,
+          this.arrival.latitude, this.arrival.longitude) < 100.0;
       if (this.weight != null) value = value && this.weight.doesFit(data.properties.weight);
       if (this.volume != null) value = value && this.volume.doesFit(data.properties.volume);
       if (this.distance != null) {
