@@ -66,11 +66,11 @@ export class VehicleGetRequestObject implements FilterObject<Vehicle> {
 
       if (this.departure != null) value = value &&
         GoogleMaps.getDistanceBetweenTwoPoints(data.departure.latitude, data.departure.longitude,
-          this.departure.latitude, this.departure.longitude) < 100.0;
+          this.departure.latitude, this.departure.longitude) < 250.0;
       if (this.departureTime != null) value = value && this.isInDayRange(data.departureTime);
       if (this.arrival != null) value = value &&
         GoogleMaps.getDistanceBetweenTwoPoints(data.arrival.latitude, data.arrival.longitude,
-          this.arrival.latitude, this.arrival.longitude) < 100.0;
+          this.arrival.latitude, this.arrival.longitude) < 250.0;
       if (this.weight != null) value = value && this.weight.doesFit(data.properties.weight);
       if (this.volume != null) value = value && this.volume.doesFit(data.properties.volume);
       if (this.distance != null) {
@@ -82,7 +82,7 @@ export class VehicleGetRequestObject implements FilterObject<Vehicle> {
       if (this.length != null) value = value && this.length.doesFit(data.dimensions.length);
 
       if (this.vehicleType != null) value = value && this.vehicleType === data.information.vehicleType;
-      if (this.archived != null) value = value && (this.archived) ? true : this.archived === data.archived;
+      if (this.archived != null) value = value && ((this.archived) ? true : this.archived === data.archived);
       if (this.verified != null) value = value && this.verified === data.verified;
 
       return value

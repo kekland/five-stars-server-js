@@ -67,9 +67,8 @@ export class CargoGetRequestObject implements FilterObject<Cargo> {
       }
 
       if (this.departure != null) {
-        value = value &&
-          (GoogleMaps.getDistanceBetweenTwoPoints(data.departure.latitude, data.departure.longitude,
-            this.departure.latitude, this.departure.longitude) < 250.0);
+        value = value && (GoogleMaps.getDistanceBetweenTwoPoints(data.departure.latitude, data.departure.longitude,
+          this.departure.latitude, this.departure.longitude) < 250.0);
       }
       if (this.departureTime != null) value = value && this.isInDayRange(data.departureTime);
       if (this.arrival != null) {
@@ -89,7 +88,7 @@ export class CargoGetRequestObject implements FilterObject<Cargo> {
 
       if (this.dangerous != null) value = value && this.dangerous === data.information.dangerous;
       if (this.vehicleType != null) value = value && this.vehicleType === data.information.vehicleType;
-      if (this.archived != null) value = value && (this.archived) ? true : this.archived === data.archived;
+      if (this.archived != null) value = value && ((this.archived) ? true : this.archived === data.archived);
       if (this.verified != null) value = value && this.verified === data.verified;
 
       return value
