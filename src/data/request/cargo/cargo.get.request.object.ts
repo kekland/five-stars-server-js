@@ -67,16 +67,15 @@ export class CargoGetRequestObject implements FilterObject<Cargo> {
       }
 
       if (this.departure != null) {
-        console.log(JSON.stringify(data.departure), JSON.stringify(this.departure))
         value = value &&
           (GoogleMaps.getDistanceBetweenTwoPoints(data.departure.latitude, data.departure.longitude,
-            this.departure.latitude, this.departure.longitude) < 100.0);
+            this.departure.latitude, this.departure.longitude) < 250.0);
       }
       if (this.departureTime != null) value = value && this.isInDayRange(data.departureTime);
       if (this.arrival != null) {
         value = value &&
           (GoogleMaps.getDistanceBetweenTwoPoints(data.arrival.latitude, data.arrival.longitude,
-            this.arrival.latitude, this.arrival.longitude) < 100.0);
+            this.arrival.latitude, this.arrival.longitude) < 250.0);
       }
       if (this.weight != null) value = value && this.weight.doesFit(data.properties.weight);
       if (this.volume != null) value = value && this.volume.doesFit(data.properties.volume);
