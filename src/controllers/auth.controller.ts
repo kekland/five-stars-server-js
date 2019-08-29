@@ -4,13 +4,23 @@ import { ValidationService } from '../lapis_server/utils';
 import { AuthRegisterRequestObject } from '../data/request/auth/auth.register.request.object';
 import { DatabaseService } from '../database/database.service';
 import { User } from '../models/user/user.model';
-import { BadRequestException } from '../lapis_server/errors';
+import { BadRequestException, UnauthorizedException } from '../lapis_server/errors';
 import { UserService } from '../database/user.service';
 import { AuthAvailabilityRequestObject } from '../data/request/auth/auth.availability.request.object';
 import { sign, decode, verify } from 'jsonwebtoken'
 import { Request } from 'express'
-import { AuthLoginRequestObject } from '../data/request/auth/auth.login.request.object';
+import { AuthLoginRequestObject, AuthChangePasswordRequestObject } from '../data/request/auth/auth.login.request.object';
 import { secretKey } from '../secret';
+import * as admin from 'firebase-admin'
+import { hashSync, genSaltSync } from 'bcrypt';
+
+// tslint:disable-next-line:no-var-requires
+const serviceAccount = require('./serviceAccount.json')
+
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+  databaseURL: 'https://five-stars-ae4d1.firebaseio.com',
+});
 
 @RoutedController('/auth')
 export class AuthController extends Controller {
@@ -66,5 +76,29 @@ export class AuthController extends Controller {
 
     const jwtToken = sign({ username: data.username }, secretKey, { expiresIn: '1d' })
     return { token: jwtToken }
+  }
+
+  @Post('/changePassword')
+  async changePassword(req: any) {
+    const data = await ValidationService
+      .transformAndValidate<AuthChangePasswordRequestObject>(req.body, () => AuthChangePasswordRequestObject)
+
+    if (req.payload == null) {
+      throw new UnauthorizedException({ message: 'Not allowed to add cargo.' })
+    }
+    const user = await DatabaseService.userStore.get({ username: req.payload.username })
+
+    try {
+      const fireUser = await admin.auth().getUserByPhoneNumber(user.phoneNumber)
+      const newHash = hashSync(data.password, genSaltSync(10))
+      user.hashedPassword = newHash
+      await user.save()
+      await admin.auth().deleteUser(fireUser.uid)
+
+      return { saved: true }
+    }
+    catch (e) {
+      throw new BadRequestException({ message: 'Not allowed.' })
+    }
   }
 }

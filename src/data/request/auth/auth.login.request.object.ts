@@ -9,3 +9,10 @@ export class AuthLoginRequestObject {
   @Validator.IsString()
   password: string;
 }
+
+export class AuthChangePasswordRequestObject {
+  @Validator.IsNotEmpty()
+  @Validator.IsString()
+  @Validator.Length(6)
+  password: string;
+}

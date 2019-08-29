@@ -4,3 +4,4 @@ node_modules/
 /database/
 .vscode/
 src/secret.ts
+src/controllers/serviceAccount.json
