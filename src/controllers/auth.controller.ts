@@ -83,10 +83,7 @@ export class AuthController extends Controller {
     const data = await ValidationService
       .transformAndValidate<AuthChangePasswordRequestObject>(req.body, () => AuthChangePasswordRequestObject)
 
-    if (req.payload == null) {
-      throw new UnauthorizedException({ message: 'Not allowed to add cargo.' })
-    }
-    const user = await DatabaseService.userStore.get({ username: req.payload.username })
+    const user = await DatabaseService.userStore.get({ username: data.username })
 
     try {
       const fireUser = await admin.auth().getUserByPhoneNumber(user.phoneNumber)

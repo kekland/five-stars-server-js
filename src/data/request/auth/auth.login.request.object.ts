@@ -15,4 +15,8 @@ export class AuthChangePasswordRequestObject {
   @Validator.IsString()
   @Validator.Length(6)
   password: string;
+
+  @Validator.IsNotEmpty()
+  @Validator.IsString()
+  username: string;
 }
