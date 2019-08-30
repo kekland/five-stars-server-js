@@ -83,10 +83,10 @@ export class AuthController extends Controller {
     const data = await ValidationService
       .transformAndValidate<AuthChangePasswordRequestObject>(req.body, () => AuthChangePasswordRequestObject)
 
-    const user = await DatabaseService.userStore.get({ username: data.username })
+    const user = await DatabaseService.userStore.get({ phoneNumber: data.phoneNumber })
 
     try {
-      const fireUser = await admin.auth().getUserByPhoneNumber(user.phoneNumber)
+      const fireUser = await admin.auth().getUserByPhoneNumber(data.phoneNumber)
       const newHash = hashSync(data.password, genSaltSync(10))
       user.hashedPassword = newHash
       await user.save()

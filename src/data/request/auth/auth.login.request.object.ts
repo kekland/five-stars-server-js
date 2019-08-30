@@ -18,5 +18,5 @@ export class AuthChangePasswordRequestObject {
 
   @Validator.IsNotEmpty()
   @Validator.IsString()
-  username: string;
+  phoneNumber: string;
 }
