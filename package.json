@@ -34,7 +34,7 @@
     "axios": "^0.19.0",
     "bcrypt": "^3.0.6",
     "class-transformer": "^0.2.3",
-    "class-validator": "^0.9.1",
+    "class-validator": "^0.14.0",
     "connect-history-api-fallback": "^1.6.0",
     "cors": "^2.8.5",
     "express": "^4.17.1",
